@@ -31,6 +31,12 @@ version_queries:
   drupal:
     command: ["drush", "status"]
     pattern: "^Drupal version\\s*:\\s*(?P<Version>[0-9\\.]+).*$"
+  elasticsearch:
+    command: ["elasticsearch", "--version"]
+    pattern: "^Version: (?P<Version>[0-9\\.]+).*$"
+  elixir:
+    command: ["elixir", "-v"]
+    pattern: "^Elixir (?P<Version>[0-9\\.]+).+$"
   fedora:
     command: ["lsb_release", "-r"]
     pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
@@ -39,13 +45,19 @@ version_queries:
     pattern: "ffmpeg version (?P<Version>[0-9\\.]+).+$"
   firefox:
     command: ["firefox", "--version"]
-    pattern: "Mozilla Firefox (?P<Version>[0-9\\.]+)$"
+    pattern: "^Mozilla Firefox (?P<Version>[0-9\\.]+)$"
+  freebsd:
+    command: ["uname", "-r"]
+    pattern: "^(?P<Version>[0-9\\.]+).*$"
   go:
     command: ["go", "version"]
     pattern: "^go version go(?P<Version>[0-9\\.]+) .+$"
   java:
     command: ["java", "-version"]
     pattern: "^java version \"(?P<Version>[0-9\\.]+)\"$"
+  linux:
+    command: ["uname", "-r"]
+    pattern: "^(?P<Version>[0-9\\.]+).*$"
   macos:
     command: ["sw_vers", "-ProductVersion"]
   openssl:
