@@ -1,8 +1,10 @@
 package cicada
 
 import (
+	"github.com/MasterMinds/semver"
 	"gopkg.in/yaml.v2"
 
+	"fmt"
 	"time"
 )
 
@@ -11,16 +13,33 @@ const RFC3339DateFormat = "2006-01-02"
 
 // Schedule models LTS series.
 type Schedule struct {
-	// Name denotes a software component.
+	// Name denotes a software component:
+	// Either a GOOS value or an executable base path.
 	Name string `yaml:"name"`
 
-	// Version denotes a semver release range constraint.
-	Version string `yaml:"version"`
+	// Version denotes a software release series.
+	Version semver.Version `yaml:"version"`
 
 	// Expiration denotes a termination timestamp.
 	Expiration *time.Time `yaml:"expiration,omitempty"`
 }
 
+// Match reports whether a schedule applies to the given software component version.
+func (o Schedule) Match(v semver.Version) bool {
+	if v.Major() != o.Version.Major() {
+		return false
+	}
+
+	minor := o.Version.Minor()
+
+	if minor == 0 {
+		return true
+	}
+
+	return v.Minor() == minor
+}
+
+// MarshalYAML encodes schedules.
 func (o Schedule) MarshalYAML() ([]byte, error) {
 	type ScheduleAlias struct {
 		Name string `yaml:"name"`
@@ -30,7 +49,7 @@ func (o Schedule) MarshalYAML() ([]byte, error) {
 
 	var aux ScheduleAlias
 	aux.Name = o.Name
-	aux.Version = o.Version
+	aux.Version = o.Version.String()
 
 	if o.Expiration != nil {
 		aux.Expiration = o.Expiration.Format(RFC3339DateFormat)
@@ -39,6 +58,7 @@ func (o Schedule) MarshalYAML() ([]byte, error) {
 	return yaml.Marshal(aux)
 }
 
+// UnmarshalYAML decodes schedules.
 func (o *Schedule) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	type ScheduleAlias struct {
 		Name string `yaml:"name"`
@@ -63,6 +83,31 @@ func (o *Schedule) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 
 	o.Name = aux.Name
-	o.Version = aux.Version
+	version, err := semver.NewVersion(aux.Version)
+
+	if err != nil {
+		return err
+	}
+
+	o.Version = *version
+	return nil
+}
+
+func ScanComponent(name string, version semver.Version, schedules []Schedule, t time.Time) *string {
+	for _, schedule := range schedules {
+		if !schedule.Match(version) {
+			continue
+		}
+
+		if schedule.Expiration != nil {
+			expiration := *schedule.Expiration
+
+			if t.After(expiration) {
+				message := fmt.Sprintf("end of life for %v v%v on %v", name, version.String(), expiration.Format(RFC3339DateFormat))
+				return &message
+			}
+		}
+	}
+
 	return nil
 }

@@ -7,11 +7,14 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/user"
 	"path"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -23,11 +26,18 @@ const IndexCacheBase = "cicada.yaml"
 
 // Index models a catalog of LTS schedules.
 type Index struct {
+	Debug bool `yaml:"debug,omitempty"`
+
 	// OperatingSystems denotes operating system schedules.
 	OperatingSystems map[string][]Schedule `yaml:"operating_systems"`
 
-	// ProgrammingLanguages denotes programming langauge schedules.
-	ProgrammingLanguages map[string][]Schedule `yaml:"programming_languages"`
+	// Applications denotes application schedules,
+	// keyed on executable base path.
+	Applications map[string][]Schedule `yaml:"applications"`
+
+	// VersionQueries denotes command line queries for retrieving component versions, in exec-like format,
+	// keyed on executable base path.
+	VersionQueries map[string][]string `yaml:"version_queries"`
 }
 
 // IndexCachePath denotes the location of the cached LTS index.
@@ -80,6 +90,22 @@ func CacheIndex(indexCachePath string) error {
 	return nil
 }
 
+// ValidateVersionQueries ensures version query data integrity.
+func (o Index) ValidateVersionQueries() error {
+	for component, query := range o.VersionQueries {
+		if len(query) == 0 {
+			return fmt.Errorf("%v has an empty version query", component)
+		}
+	}
+
+	return nil
+}
+
+// Validate ensures data integrity.
+func (o Index) Validate() error {
+	return o.ValidateVersionQueries()
+}
+
 // Load generates an LTS index.
 func Load(update bool) (*Index, error) {
 	indexCachePathP, err := IndexCachePath()
@@ -110,7 +136,27 @@ func Load(update bool) (*Index, error) {
 		return nil, err2
 	}
 
+	if err2 := index.Validate(); err2 != nil {
+		return nil, err2
+	}
+
 	return index, nil
+}
+
+// QueryVersion extracts software component versions.
+func QueryVersion(query []string) (*string, error) {
+	command, args := query[0], query[1:]
+	cmd := exec.Command(command, args...)
+	cmd.Stderr = os.Stderr
+	versionBytes, err := cmd.Output()
+
+	if err != nil {
+		return nil, err
+	}
+
+	versionString := string(versionBytes)
+	versionString = strings.TrimRight(versionString, "\r\n")
+	return &versionString, nil
 }
 
 // ScanOs analyzes operating system for any LTS concerns.
@@ -122,7 +168,47 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 		return nil, fmt.Errorf("no support schedule found for os: %v\n", identityOs)
 	}
 
-	versionString, err := GetOsVersion()
+	query, ok := o.VersionQueries[identityOs]
+
+	if !ok {
+		return nil, fmt.Errorf("no version query command found for os: %v\n", identityOs)
+	}
+
+	versionString, err := QueryVersion(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	versionP, err := semver.NewVersion(*versionString)
+
+	if err != nil {
+		return nil, err
+	}
+
+	version := *versionP
+
+	if o.Debug {
+		log.Printf("detected os: %v v%v\n", identityOs, version.String())
+	}
+
+	return ScanComponent(identityOs, version, schedules, t), nil
+}
+
+func (o Index) ScanApplication(executable string, schedules []Schedule, t time.Time) (*string, error) {
+	_, err := exec.LookPath(executable)
+
+	if err != nil {
+		return nil, err
+	}
+
+	query, ok := o.VersionQueries[executable]
+
+	if !ok {
+		return nil, fmt.Errorf("no version query command found for executable: %v\n", executable)
+	}
+
+	versionString, err := QueryVersion(query)
 
 	if err != nil {
 		return nil, err
@@ -134,53 +220,30 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 		return nil, err
 	}
 
-	versionMajor := version.Major()
-	versionMinor := version.Minor()
-
-	var foundSchedule bool
-
-	for _, schedule := range schedules {
-		scheduleVersion, err2 := semver.NewVersion(schedule.Version)
-
-		if err2 != nil {
-			return nil, err2
-		}
-
-		scheduleVersionMajor := scheduleVersion.Major()
-
-		if versionMajor != scheduleVersionMajor {
-			continue
-		}
-
-		scheduleVersionMinor := scheduleVersion.Minor()
-
-		if scheduleVersionMinor != 0 && versionMinor != scheduleVersionMinor {
-			continue
-		}
-
-		foundSchedule = true
-
-		if schedule.Expiration != nil {
-			expiration := *schedule.Expiration
-
-			if t.After(expiration) {
-				message := fmt.Sprintf("end of life for os %v %v on %v", identityOs, versionString, expiration)
-				return &message, nil
-			}
-		}
+	if o.Debug {
+		log.Printf("detected application %v v%v\n", executable, version.String())
 	}
 
-	if !foundSchedule {
-		return nil, fmt.Errorf("no matching support schedule found for os %v version %v\n", identityOs, versionString)
-	}
-
-	return nil, nil
+	return ScanComponent(executable, *version, schedules, t), nil
 }
 
-// ScanProgrammingLanguages analyzes programming languages for any LTS concerns.
-func (o Index) ScanProgrammingLanguages(t time.Time) ([]string, error) {
-	// ...
-	return nil, nil
+// ScanApplications analyzes applications for any LTS concerns.
+func (o Index) ScanApplications(t time.Time) ([]string, error) {
+	var warnings []string
+
+	for executable, schedules := range o.Applications {
+		warning, err := o.ScanApplication(executable, schedules, t)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if warning != nil {
+			warnings = append(warnings, *warning)
+		}
+	}
+
+	return warnings, nil
 }
 
 // Scan generates reports.
@@ -198,12 +261,12 @@ func (o Index) Scan() ([]string, error) {
 		warnings = append(warnings, *warningOs)
 	}
 
-	resultsProgrammingLanguages, err := o.ScanProgrammingLanguages(t)
+	resultsApplications, err := o.ScanApplications(t)
 
 	if err != nil {
 		return nil, err
 	}
 
-	warnings = append(warnings, resultsProgrammingLanguages...)
+	warnings = append(warnings, resultsApplications...)
 	return warnings, nil
 }
