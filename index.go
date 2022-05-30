@@ -4,6 +4,7 @@ import (
 	"github.com/MasterMinds/semver"
 	"gopkg.in/yaml.v2"
 
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -13,49 +14,152 @@ import (
 	"os/exec"
 	"os/user"
 	"path"
-	"runtime"
-	"strings"
 	"time"
 )
 
 // IndexUrl denotes the location of the LTS index resource.
 const IndexUrl = "https://raw.githubusercontent.com/mcandre/cicada/main/cicada.yaml"
 
-// IndexCacheBase denotes the base path of the cached LTS index.
+// EndOfLifeBaseUrl denotes the base location of the endoflife.date service.
+const EndOfLifeBaseUrl = "https://endoflife.date/api"
+
+// ProductsListResourceBase denotes the location of the products list resource.
+const ProductsListResourceBase = "all.json"
+
+// IndexCacheRoot denotes the cicada metadata directory base path,
+// relative to the home directory.
+const IndexCacheRoot = ".cicada"
+
+// IndexCacheBase denotes the base path of the cached LTS index,
+// relative to IndexCacheRoot.
 const IndexCacheBase = "cicada.yaml"
+
+// IndexProductsListBase denotes the base path of the products list file,
+// relative to IndexCacheRoot.
+const IndexProductsListBase = "products.json"
+
+// IndexProductsDirBase denotes the base path of the products directory,
+// relative to IndexCacheRoot.
+const IndexProductsDirBase = "products"
 
 // Index models a catalog of LTS schedules.
 type Index struct {
 	Debug bool `yaml:"debug,omitempty"`
 
-	// OperatingSystems denotes operating system schedules.
-	OperatingSystems map[string][]Schedule `yaml:"operating_systems"`
-
-	// Applications denotes application schedules,
-	// keyed on executable base path.
-	Applications map[string][]Schedule `yaml:"applications"`
-
 	// VersionQueries denotes command line queries for retrieving component versions, in exec-like format,
 	// keyed on executable base path.
-	VersionQueries map[string][]string `yaml:"version_queries"`
+	VersionQueries map[string]VersionQuery `yaml:"version_queries"`
+
+	// components denotes version schedules,
+	// keyed on component name.
+	components map[string][]Schedule `yaml:"-"`
 }
 
-// IndexCachePath denotes the location of the cached LTS index.
-func IndexCachePath() (*string, error) {
+// IndexCacheDirPath yields the location of cicada metadata directory.
+func IndexCacheDirPath() (*string, error) {
 	user, err := user.Current()
 
 	if err != nil {
 		return nil, err
 	}
 
-	pth := path.Join(user.HomeDir, IndexCacheBase)
-
+	pth := path.Join(user.HomeDir, IndexCacheRoot)
 	return &pth, nil
 }
 
-// CacheIndex populates a local LTS index.
-func CacheIndex(indexCachePath string) error {
-	f, err := os.Create(indexCachePath)
+// IndexCacheConfigPath yields the location of the cicada configuration.
+func IndexCacheConfigPath() (*string, error) {
+	user, err := user.Current()
+
+	if err != nil {
+		return nil, err
+	}
+
+	pth := path.Join(user.HomeDir, IndexCacheRoot, IndexCacheBase)
+	return &pth, nil
+}
+
+// CacheLifetimeData ensures a local copy of endoflife.date records.
+func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath string) error {
+	fProductList, err := os.Create(indexProductsListFilePath)
+
+	u := fmt.Sprintf("%v/%v", EndOfLifeBaseUrl, ProductsListResourceBase)
+	res, err := http.Get(u)
+
+	if err != nil {
+		return err
+	}
+
+	statusCode := res.StatusCode
+
+	if statusCode < 200 || statusCode > 299 {
+		return fmt.Errorf("get: %v returned status code: %v", u, statusCode)
+	}
+
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+
+	defer func() {
+		if err2 := fProductList.Close(); err2 != nil {
+			fmt.Fprintf(os.Stderr, err2.Error())
+		}
+	}()
+
+	if _, err2 := fProductList.Write(body); err2 != nil {
+		return err2
+	}
+
+	var products []string
+	if err2 := json.Unmarshal(body, &products); err2 != nil {
+		return err2
+	}
+
+	if err2 := os.MkdirAll(indexProductsDirPath, os.ModePerm); err2 != nil {
+		return err2
+	}
+
+	for _, product := range products {
+		productBase := fmt.Sprintf("%v.json", product)
+		productFilePath := path.Join(indexProductsDirPath, productBase)
+		fProductDetail, err2 := os.Create(productFilePath)
+
+		if err2 != nil {
+			return err2
+		}
+
+		u2 := fmt.Sprintf("%v/%v", EndOfLifeBaseUrl, productBase)
+		res, err2 := http.Get(u2)
+
+		if err2 != nil {
+			return err2
+		}
+
+		statusCode := res.StatusCode
+
+		if statusCode < 200 || statusCode > 299 {
+			return fmt.Errorf("get: %v returned status code: %v", u2, statusCode)
+		}
+
+		defer res.Body.Close()
+
+		body, err2 := io.ReadAll(res.Body)
+
+		if err2 != nil {
+			return err2
+		}
+
+		if _, err3 := fProductDetail.Write(body); err3 != nil {
+			return err3
+		}
+	}
+
+	return nil
+}
+
+// CacheIndex populates a cicada index.
+func CacheIndex(indexDirPath string, indexCacheConfigPath string, indexProductsListFilePath string, indexProductsDirPath string) error {
+	f, err := os.Create(indexCacheConfigPath)
 
 	if err != nil {
 		return err
@@ -87,13 +191,13 @@ func CacheIndex(indexCachePath string) error {
 		return err
 	}
 
-	return nil
+	return CacheLifetimeData(indexProductsListFilePath, indexProductsDirPath)
 }
 
 // ValidateVersionQueries ensures version query data integrity.
 func (o Index) ValidateVersionQueries() error {
 	for component, query := range o.VersionQueries {
-		if len(query) == 0 {
+		if len(query.Command) == 0 {
 			return fmt.Errorf("%v has an empty version query", component)
 		}
 	}
@@ -106,27 +210,43 @@ func (o Index) Validate() error {
 	return o.ValidateVersionQueries()
 }
 
-// Load generates an LTS index.
+// Load generates a partial LTS index.
 func Load(update bool) (*Index, error) {
-	indexCachePathP, err := IndexCachePath()
+	indexDirPathP, err := IndexCacheDirPath()
 
 	if err != nil {
 		return nil, err
 	}
 
-	indexCachePath := *indexCachePathP
+	indexDirPath := *indexDirPathP
 
-	_, err = os.Stat(indexCachePath)
+	if err := os.MkdirAll(indexDirPath, os.ModePerm); err != nil {
+		return nil, err
+	}
+
+	indexCacheConfigPathP, err := IndexCacheConfigPath()
+
+	if err != nil {
+		return nil, err
+	}
+
+	indexCacheConfigPath := *indexCacheConfigPathP
+
+	indexProductsListFilePath := path.Join(indexDirPath, IndexProductsListBase)
+	indexProductsDirPath := path.Join(indexDirPath, IndexProductsDirBase)
+
+	_, err = os.Stat(indexCacheConfigPath)
 
 	if update || os.IsNotExist(err) {
-		if err2 := CacheIndex(indexCachePath); err2 != nil {
+		if err2 := CacheIndex(indexDirPath, indexCacheConfigPath, indexProductsListFilePath, indexProductsDirPath); err2 != nil {
 			return nil, err2
 		}
 	}
 
 	index := new(Index)
+	index.components = make(map[string][]Schedule)
 
-	contentYAML, err := ioutil.ReadFile(indexCachePath)
+	contentYAML, err := ioutil.ReadFile(indexCacheConfigPath)
 
 	if err != nil {
 		return nil, err
@@ -140,29 +260,52 @@ func Load(update bool) (*Index, error) {
 		return nil, err2
 	}
 
-	return index, nil
-}
-
-// QueryVersion extracts software component versions.
-func QueryVersion(query []string) (*string, error) {
-	command, args := query[0], query[1:]
-	cmd := exec.Command(command, args...)
-	cmd.Stderr = os.Stderr
-	versionBytes, err := cmd.Output()
+	productListBuf, err := os.ReadFile(indexProductsListFilePath)
 
 	if err != nil {
 		return nil, err
 	}
 
-	versionString := string(versionBytes)
-	versionString = strings.TrimRight(versionString, "\r\n")
-	return &versionString, nil
+	var products []string
+	if err2 := json.Unmarshal(productListBuf, &products); err2 != nil {
+		return nil, err2
+	}
+
+	for _, product := range products {
+		productDetailPath := fmt.Sprintf("%v.json", path.Join(indexProductsDirPath, product))
+		productDetailBuf, err2 := os.ReadFile(productDetailPath)
+
+		if err2 != nil {
+			return nil, err2
+		}
+
+		var records ProductRecords
+		if err2 := json.Unmarshal(productDetailBuf, &records); err2 != nil {
+			return nil, err2
+		}
+
+		schedules, err := ProductRecordsToSchedules(product, records)
+
+		if err != nil {
+			return nil, err
+		}
+
+		index.components[product] = schedules
+	}
+
+	return index, nil
 }
 
 // ScanOs analyzes operating system for any LTS concerns.
 func (o Index) ScanOs(t time.Time) (*string, error) {
-	identityOs := runtime.GOOS
-	schedules, ok := o.OperatingSystems[identityOs]
+	identityOsP, err := RecognizeOs()
+
+	if err != nil {
+		return nil, err
+	}
+
+	identityOs := *identityOsP
+	schedules, ok := o.components[identityOs]
 
 	if !ok {
 		return nil, fmt.Errorf("no support schedule found for os: %v\n", identityOs)
@@ -174,7 +317,7 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 		return nil, fmt.Errorf("no version query command found for os: %v\n", identityOs)
 	}
 
-	versionString, err := QueryVersion(query)
+	versionString, err := query.Execute()
 
 	if err != nil {
 		return nil, err
@@ -196,22 +339,25 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 }
 
 func (o Index) ScanApplication(executable string, schedules []Schedule, t time.Time) (*string, error) {
-	_, err := exec.LookPath(executable)
-
-	if err != nil {
-		return nil, err
+	if _, err := exec.LookPath(executable); err != nil {
+		return nil, nil
 	}
 
 	query, ok := o.VersionQueries[executable]
 
 	if !ok {
-		return nil, fmt.Errorf("no version query command found for executable: %v\n", executable)
+		fmt.Fprintf(os.Stderr, "no version query command found for executable: %v\n", executable)
+		return nil, nil
 	}
 
-	versionString, err := QueryVersion(query)
+	versionString, err := query.Execute()
 
 	if err != nil {
 		return nil, err
+	}
+
+	if versionString == nil {
+		return nil, nil
 	}
 
 	version, err := semver.NewVersion(*versionString)
@@ -231,7 +377,7 @@ func (o Index) ScanApplication(executable string, schedules []Schedule, t time.T
 func (o Index) ScanApplications(t time.Time) ([]string, error) {
 	var warnings []string
 
-	for executable, schedules := range o.Applications {
+	for executable, schedules := range o.components {
 		warning, err := o.ScanApplication(executable, schedules, t)
 
 		if err != nil {

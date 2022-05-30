@@ -6,7 +6,7 @@
 $ cd example
 
 $ cicada
-warning: end of life for python3 v3.6.15 on 2021-12-23
+warning: end of life for python v3.6.15 on 2021-12-23
 ```
 
 See `cicada -help` for more options.

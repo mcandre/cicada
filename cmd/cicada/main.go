@@ -35,7 +35,6 @@ func main() {
 
 	if *flagDebug {
 		index.Debug = true
-		log.Printf("index: %v\n", index)
 	}
 
 	warnings, err := index.Scan()
