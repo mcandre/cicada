@@ -1,5 +1,11 @@
 ---
 version_queries:
+  debian:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  fedora:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
   ffmpeg:
     command: ["ffmpeg", "--version"]
     pattern: "ffmpeg version (?P<Version>[0-9\\.]+).+$"
@@ -24,6 +30,9 @@ version_queries:
   rails:
     command: ["rails", "-v"]
     pattern: "(?s)^Rails (?P<Version>[0-9\\.]+)$"
+  rhel:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
   ruby:
     command: ["ruby", "-v"]
     pattern: "^ruby (?P<Version>[0-9\\.]+).+$"
