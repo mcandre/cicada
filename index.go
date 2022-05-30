@@ -16,7 +16,7 @@ import (
 )
 
 // IndexUrl denotes the location of the LTS index resource.
-const IndexUrl = "https://raw.githubusercontent.com/mcandre/cicada/master/cicada.yaml"
+const IndexUrl = "https://raw.githubusercontent.com/mcandre/cicada/main/cicada.yaml"
 
 // IndexCacheBase denotes the base path of the cached LTS index.
 const IndexCacheBase = "cicada.yaml"
