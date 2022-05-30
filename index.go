@@ -81,6 +81,8 @@ func IndexCacheConfigPath() (*string, error) {
 
 // CacheLifetimeData ensures a local copy of endoflife.date records.
 func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath string) error {
+	log.Printf("Caching new product data...\n")
+
 	fProductList, err := os.Create(indexProductsListFilePath)
 
 	u := fmt.Sprintf("%v/%v", EndOfLifeBaseUrl, ProductsListResourceBase)
@@ -159,6 +161,8 @@ func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath st
 
 // CacheIndex populates a cicada index.
 func CacheIndex(indexDirPath string, indexCacheConfigPath string, indexProductsListFilePath string, indexProductsDirPath string) error {
+	log.Printf("Caching new default configuration...\n")
+
 	f, err := os.Create(indexCacheConfigPath)
 
 	if err != nil {
