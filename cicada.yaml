@@ -3,6 +3,9 @@ version_queries:
   alpine:
     command: ["grep", "VERSION_ID", "/etc/os-release"]
     pattern: "^VERSION_ID=(?P<Version>[0-9\\.]+)$"
+  amazon-linux:
+    command: ["cat", "/etc/system-release"]
+    pattern: "^Amazon Linux release (?P<Version>[0-9\\.]+).+$"
   debian:
     command: ["lsb_release", "-r"]
     pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
