@@ -3,6 +3,9 @@ version_queries:
   ffmpeg:
     command: ["ffmpeg", "--version"]
     pattern: "ffmpeg version (?P<Version>[0-9\\.]+).+$"
+  firefox:
+    command: ["firefox", "--version"]
+    pattern: "Mozilla Firefox (?P<Version>[0-9\\.]+)$"
   go:
     command: ["go", "version"]
     pattern: "^go version go(?P<Version>[0-9\\.]+) .+$"
@@ -24,3 +27,6 @@ version_queries:
   ruby:
     command: ["ruby", "-v"]
     pattern: "^ruby (?P<Version>[0-9\\.]+).+$"
+  ubuntu:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
