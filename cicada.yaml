@@ -1,14 +1,36 @@
 ---
 version_queries:
+  almalinux:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
   alpine:
     command: ["grep", "VERSION_ID", "/etc/os-release"]
     pattern: "^VERSION_ID=(?P<Version>[0-9\\.]+)$"
   amazon-linux:
     command: ["cat", "/etc/system-release"]
     pattern: "^Amazon Linux release (?P<Version>[0-9\\.]+).+$"
+  ansible:
+    command: ["ansible", "--version"]
+    pattern: "^ansible \\[core (?P<Version>[0-9\\.]+)\\]$"
+  apache:
+    command: ["httpd", "-v"]
+    pattern: "^Server version: Apache/(?P<Version>[0-9\\.]+).+$"
+  centos:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  consul:
+    command: ["consul", "version"]
+    pattern: "^Consul v(?P<Version>[0-9\\.]+)$"
   debian:
     command: ["lsb_release", "-r"]
     pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  django:
+    command: ["django-admin", "--version"]
+  docker-engine:
+    command: ["docker", "version", "--format", "{{.Client.Version}}"]
+  drupal:
+    command: ["drush", "status"]
+    pattern: "^Drupal version\\s*:\\s*(?P<Version>[0-9\\.]+).*$"
   fedora:
     command: ["lsb_release", "-r"]
     pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
