@@ -1,0 +1,17 @@
+---
+operating_systems:
+  darwin:
+  - name: "macos"
+    version: "12"
+  - name: "macos"
+    version: "11"
+  - name: "macos"
+    version: "10.15"
+  - name: "macos"
+    version: "10.14"
+    expiration: "2021-10-25"
+programming_languages:
+  node:
+  - name: "node"
+    version: "16"
+    expiration: "2024-04-30"
