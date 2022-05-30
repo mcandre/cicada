@@ -11,9 +11,21 @@ import (
 
 var flagDebug = flag.Bool("debug", false, "Enable additional logging")
 var flagUpdate = flag.Bool("update", false, "Force LTS index cache update")
+var flagVersion = flag.Bool("version", false, "Show version information")
+var flagHelp = flag.Bool("help", false, "Show usage information")
 
 func main() {
 	flag.Parse()
+
+	if *flagHelp {
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
+	if *flagVersion {
+		fmt.Println(cicada.Version)
+		os.Exit(0)
+	}
 
 	index, err := cicada.Load(*flagUpdate)
 
