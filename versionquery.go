@@ -11,11 +11,19 @@ import (
 // VersionQuery models commands for extracting software component version information.
 type VersionQuery struct {
 	// Command denotes an exec-like command line instruction.
+	//
+	// Command output is always right trimmed.
 	Command []string `yaml:"command"`
 
 	// Pattern denotes an optional expression for
 	// capturing version strings within
 	// larger, complex output buffers.
+	//
+	// nil indicates the full command output,
+	// sans right trim,
+	// is treated as a semver version string.
+	//
+	// (default: nil)
 	Pattern *regexp.Regexp `yaml:"pattern,omitempty"`
 }
 

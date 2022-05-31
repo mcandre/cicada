@@ -18,9 +18,15 @@ type Schedule struct {
 	Name string `yaml:"name"`
 
 	// Version denotes a software release series.
+	// Only the major and minor are included in end of life calculations.
+	// Zero minor is treated as matching any minor.
 	Version semver.Version `yaml:"version"`
 
 	// Expiration denotes a termination timestamp.
+	//
+	// nil indicates no known expiration.
+	//
+	// (default: nil)
 	Expiration *time.Time `yaml:"expiration,omitempty"`
 }
 

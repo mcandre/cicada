@@ -44,7 +44,11 @@ const IndexProductsDirBase = "products"
 
 // Index models a catalog of LTS schedules.
 type Index struct {
+	// Debug enables additional logging (default: false).
 	Debug bool `yaml:"debug,omitempty"`
+
+	// Quiet skips system executables (default: false).
+	Quiet bool `yaml:"quiet,omitempty"`
 
 	// VersionQueries denotes command line queries for retrieving component versions, in exec-like format,
 	// keyed on executable base path.
@@ -388,10 +392,19 @@ func (o Index) ScanApplication(app string, schedules []Schedule, t time.Time) (*
 
 	executable := query.Command[0]
 
-	if _, err := exec.LookPath(executable); err != nil {
+	executablePath, err := exec.LookPath(executable);
 
+	if err != nil {
 		if o.Debug {
 			log.Printf("executable not found: %v for application %v; skipping\n", executable, app)
+		}
+
+		return nil, nil
+	}
+
+	if o.Quiet && IsSystemExecutable(executablePath) {
+		if o.Debug {
+			log.Printf("executable: %v found in system path; skipping\n", executable)
 		}
 
 		return nil, nil

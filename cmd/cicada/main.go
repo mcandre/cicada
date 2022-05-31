@@ -9,6 +9,7 @@ import (
 	"os"
 )
 
+var flagQuiet = flag.Bool("quiet", false, "Skip system components unlikely to be actionable")
 var flagDebug = flag.Bool("debug", false, "Enable additional logging")
 var flagUpdate = flag.Bool("update", false, "Force LTS index cache update")
 var flagClean = flag.Bool("clean", false, "Remove cicada artifacts")
@@ -44,6 +45,10 @@ func main() {
 
 	if *flagDebug {
 		index.Debug = true
+	}
+
+	if *flagQuiet {
+		index.Quiet = true
 	}
 
 	warnings, err := index.Scan()
