@@ -362,7 +362,7 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 	version := *versionP
 
 	if o.Debug {
-		log.Printf("detected os %v v%v\n", identityOs, version.String())
+		log.Printf("detected os: %v v%v\n", identityOs, version.String())
 	}
 
 	return ScanComponent(identityOs, version, schedules, t), nil
@@ -371,15 +371,25 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 // ScanApplication checks executables for non-LTS versions.
 //
 // If the executable is not found, a warning may not be emitted.
-func (o Index) ScanApplication(executable string, schedules []Schedule, t time.Time) (*string, error) {
-	if _, err := exec.LookPath(executable); err != nil {
+func (o Index) ScanApplication(app string, schedules []Schedule, t time.Time) (*string, error) {
+	query, ok := o.VersionQueries[app]
+
+	if !ok {
+		if o.Debug {
+			log.Printf("no version query command found for application: %v\n", app)
+		}
+
 		return nil, nil
 	}
 
-	query, ok := o.VersionQueries[executable]
+	executable := query.Command[0]
 
-	if !ok {
-		fmt.Fprintf(os.Stderr, "no version query command found for executable: %v\n", executable)
+	if _, err := exec.LookPath(executable); err != nil {
+
+		if o.Debug {
+			log.Printf("executable not found: %v for application %v; skipping\n", executable, app)
+		}
+
 		return nil, nil
 	}
 
@@ -400,7 +410,7 @@ func (o Index) ScanApplication(executable string, schedules []Schedule, t time.T
 	}
 
 	if o.Debug {
-		log.Printf("detected application %v v%v\n", executable, version.String())
+		log.Printf("detected application: %v v%v\n", executable, version.String())
 	}
 
 	return ScanComponent(executable, *version, schedules, t), nil
