@@ -9,7 +9,7 @@ $ cicada
 warning: end of life for ruby v2.6.8 on 2022-03-31
 ```
 
-See `cicada -help` for more options.
+See `cicada -help` for more detail.
 
 # ABOUT
 
@@ -17,9 +17,19 @@ Many software components offer Long Term Support (LTS) releases, which receive s
 
 Following classical UNIX conventions, cicada often emits no output of any kind, and returns zero exit status, in the case where no non-LTS components are identified. To see a list of supported versions that cicada identifies on your machine, you may run `cicada -debug` to show additional logs.
 
+# INSTALL FROM SOURCE
+
+```console
+$ go install github.com/mcandre/cicada/cmd/cicada@latest
+```
+
+# LICENSE
+
+FreeBSD
+
 # RUNTIME REQUIREMENTS
 
-(N/A)
+(None)
 
 # CONTRIBUTING
 
