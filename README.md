@@ -1,5 +1,7 @@
 # cicada: Long Term Support Analyzer
 
+*Shed your skin anew. Find the right persona.*
+
 # EXAMPLE
 
 ```console
@@ -11,9 +13,9 @@ See `cicada -help` for more options.
 
 # ABOUT
 
-cicada assists engineers with keeping software up to date. cicada warns when major software components are outside of Long Term Support (LTS) maintenance windows.
+Many software components offer Long Term Support (LTS) releases, which receive security updates, bugfixes, and new features more rapidly than older releases. This is where cicada steps in. cicada helps engineers to identify more non-LTS software components. cicada provides focused, actionable information for developers to implement. So that the larger software system remains robust, mature, and well supported by industry standards.
 
-Following classical UNIX conventions, cicada emits no output and returns zero exit status in the event that no non-LTS components are identified.
+Following classical UNIX conventions, cicada often emits no output of any kind, and returns zero exit status, in the case where no non-LTS components are identified. To see a list of supported versions that cicada identifies on your machine, you may run `cicada -debug` to show additional logs.
 
 # RUNTIME REQUIREMENTS
 
