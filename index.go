@@ -2,7 +2,7 @@ package cicada
 
 import (
 	"github.com/MasterMinds/semver"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 
 	"encoding/json"
 	"fmt"
@@ -280,7 +280,7 @@ func Load(update bool) (*Index, error) {
 		return nil, err
 	}
 
-	if err2 := yaml.UnmarshalStrict(contentYAML, index); err2 != nil {
+	if err2 := yaml.Unmarshal(contentYAML, index); err2 != nil {
 		return nil, err2
 	}
 

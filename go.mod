@@ -7,7 +7,7 @@ require (
 	github.com/magefile/mage v1.13.0
 	github.com/mcandre/mage-extras v0.0.7
 	github.com/zcalusic/sysinfo v0.9.5
-	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

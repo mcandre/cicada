@@ -2,7 +2,7 @@ package cicada
 
 import (
 	"github.com/MasterMinds/semver"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 
 	"fmt"
 	"time"
@@ -40,7 +40,7 @@ func (o Schedule) Match(v semver.Version) bool {
 }
 
 // MarshalYAML encodes schedules.
-func (o Schedule) MarshalYAML() ([]byte, error) {
+func (o Schedule) MarshalYAML() (interface{}, error) {
 	type ScheduleAlias struct {
 		Name       string `yaml:"name"`
 		Version    string `yaml:"version"`
@@ -49,17 +49,17 @@ func (o Schedule) MarshalYAML() ([]byte, error) {
 
 	var aux ScheduleAlias
 	aux.Name = o.Name
-	aux.Version = o.Version.String()
+	aux.Version = o.Version.Original()
 
 	if o.Expiration != nil {
 		aux.Expiration = o.Expiration.Format(RFC3339DateFormat)
 	}
 
-	return yaml.Marshal(aux)
+	return aux, nil
 }
 
 // UnmarshalYAML decodes schedules.
-func (o *Schedule) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (o *Schedule) UnmarshalYAML(value *yaml.Node) error {
 	type ScheduleAlias struct {
 		Name       string `yaml:"name"`
 		Version    string `yaml:"version"`
@@ -68,7 +68,7 @@ func (o *Schedule) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 	var aux ScheduleAlias
 
-	if err := unmarshal(&aux); err != nil {
+	if err := value.Decode(&aux); err != nil {
 		return err
 	}
 

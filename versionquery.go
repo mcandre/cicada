@@ -1,7 +1,7 @@
 package cicada
 
 import (
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 
 	"os/exec"
 	"regexp"
@@ -20,7 +20,7 @@ type VersionQuery struct {
 }
 
 // MarshalYAML encodes version queries.
-func (o VersionQuery) MarshalYAML() ([]byte, error) {
+func (o VersionQuery) MarshalYAML() (interface{}, error) {
 	type VersionQueryAlias struct {
 		Command []string `yaml:"command"`
 		Pattern *string  `yaml:"pattern,omitempty"`
@@ -30,11 +30,11 @@ func (o VersionQuery) MarshalYAML() ([]byte, error) {
 	aux.Command = o.Command
 	patternString := o.Pattern.String()
 	aux.Pattern = &patternString
-	return yaml.Marshal(aux)
+	return aux, nil
 }
 
 // UnmarshalYAML decodes version queries.
-func (o *VersionQuery) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (o *VersionQuery) UnmarshalYAML(value *yaml.Node) error {
 	type VersionQueryAlias struct {
 		Command []string `yaml:"command"`
 		Pattern *string  `yaml:"pattern,omitempty"`
@@ -42,7 +42,7 @@ func (o *VersionQuery) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 	var aux VersionQueryAlias
 
-	if err := unmarshal(&aux); err != nil {
+	if err := value.Decode(&aux); err != nil {
 		return err
 	}
 
