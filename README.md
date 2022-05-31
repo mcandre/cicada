@@ -21,7 +21,7 @@ See `cicada -help` for more detail.
 
 Many software components offer Long Term Support (LTS) releases, which receive security updates, bugfixes, and new features more rapidly than older releases. Unfortunately, it is often left up to the developer to opt into LTS releases. That is not an easy proposition, because software tends to grow in complexity over time. The dependency tree tends to get bigger and bigger. Meaning the risk of accidentally consuming a dead package is high. And the likelihood of spotting a dead package is low.
 
-This is where cicada steps in. cicada helps engineers to identify more non-LTS software components. In an entirelg automated fashion. cicada provides focused, actionable information for developers to implement. So that the larger software system remains robust, mature, and well supported by industry standards.
+This is where cicada steps in. cicada helps engineers to identify more non-LTS software components. In an entirely automated fashion. cicada provides focused, actionable information for developers to implement. So that the larger software system remains robust, mature, and well supported by industry standards.
 
 For enterprise systems, a variety of tools are available to identify specific vulnerabilities. But by then, it may be too late to migrate and keep up with cyberattacks. This is why cicada takes a more aggressive approach. We want to ward off entire major versions of software that do not receive ongoing patches. So that we can be one step ahead of attackers.
 
