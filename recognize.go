@@ -1,4 +1,5 @@
 //go:build !darwin && !linux
+
 package cicada
 
 import (

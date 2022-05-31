@@ -1,4 +1,5 @@
 //go:build darwin
+
 package cicada
 
 // RecognizeOs identifies the environment,

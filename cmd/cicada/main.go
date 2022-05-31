@@ -11,6 +11,7 @@ import (
 
 var flagDebug = flag.Bool("debug", false, "Enable additional logging")
 var flagUpdate = flag.Bool("update", false, "Force LTS index cache update")
+var flagClean = flag.Bool("clean", false, "Remove cicada artifacts")
 var flagVersion = flag.Bool("version", false, "Show version information")
 var flagHelp = flag.Bool("help", false, "Show usage information")
 
@@ -24,6 +25,14 @@ func main() {
 
 	if *flagVersion {
 		fmt.Println(cicada.Version)
+		os.Exit(0)
+	}
+
+	if *flagClean {
+		if err := cicada.Clean(); err != nil {
+			log.Fatal(err)
+		}
+
 		os.Exit(0)
 	}
 

@@ -447,3 +447,14 @@ func (o Index) Scan() ([]string, error) {
 	warnings = append(warnings, resultsApplications...)
 	return warnings, nil
 }
+
+// Clean removes artifacts created during cicada runs.
+func Clean() error {
+	indexCacheDirPath, err := IndexCacheDirPath()
+
+	if err != nil {
+		return err
+	}
+
+	return os.RemoveAll(*indexCacheDirPath)
+}

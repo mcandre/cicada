@@ -1,4 +1,5 @@
 //go:build android
+
 package cicada
 
 import (
