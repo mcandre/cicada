@@ -127,3 +127,6 @@ version_queries:
   windows:
     command: ["wmic", "os", "get", "Caption", "/value"]
     pattern: "Caption=Microsoft Windows (?P<Version>[0-9\\.]+)"
+  yocto:
+    command: ["sh", "-c", "grep DISTRO_VERSION $POKY-DIR/meta-poky/conf/distro/poky.conf"]
+    pattern: "^DISTRO_VERSION = \\\"(?P<Version>[0-9\\.]+)\\\"$"

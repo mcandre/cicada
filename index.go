@@ -380,6 +380,10 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 //
 // If the executable is not found, a warning may not be emitted.
 func (o Index) ScanApplication(app string, schedules []Schedule, t time.Time) (*string, error) {
+	if IsOperatingSystem(app) {
+		return nil, nil
+	}
+
 	query, ok := o.VersionQueries[app]
 
 	if !ok {
@@ -392,7 +396,7 @@ func (o Index) ScanApplication(app string, schedules []Schedule, t time.Time) (*
 
 	executable := query.Command[0]
 
-	executablePath, err := exec.LookPath(executable);
+	executablePath, err := exec.LookPath(executable)
 
 	if err != nil {
 		if o.Debug {
@@ -427,10 +431,10 @@ func (o Index) ScanApplication(app string, schedules []Schedule, t time.Time) (*
 	}
 
 	if o.Debug {
-		log.Printf("detected application: %v v%v\n", executable, version.String())
+		log.Printf("detected application: %v v%v\n", app, version.String())
 	}
 
-	return ScanComponent(executable, *version, schedules, t), nil
+	return ScanComponent(app, *version, schedules, t), nil
 }
 
 // ScanApplications analyzes applications for any LTS concerns.
