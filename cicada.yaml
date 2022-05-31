@@ -98,6 +98,9 @@ version_queries:
   php:
     command: ["php", "-v"]
     pattern: "^PHP (?P<Version>[0-9\\.]+).+$"
+  postgresql:
+    command: ["postgres", "-V"]
+    pattern: "^postgres \\(PostgreSQL\\) (?P<Version>[0-9\\.]+)$"
   python:
     command: ["python", "-c", "import platform; print(platform.python_version())"]
   rails:
