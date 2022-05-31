@@ -354,7 +354,7 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 	}
 
 	if versionString == nil {
-		log.Fatal("unable to identify version for os: %v", identityOs)
+		log.Fatalf("unable to identify version for os: %v", identityOs)
 	}
 
 	versionP, err := semver.NewVersion(*versionString)
