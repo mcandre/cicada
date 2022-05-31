@@ -81,7 +81,7 @@ func IndexCacheConfigPath() (*string, error) {
 
 // CacheLifetimeData ensures a local copy of endoflife.date records.
 func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath string) error {
-	log.Printf("Caching new product data...\n")
+	log.Println("Caching new product data...")
 
 	fProductList, err := os.Create(indexProductsListFilePath)
 
@@ -104,7 +104,7 @@ func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath st
 
 	defer func() {
 		if err2 := res.Body.Close(); err2 != nil {
-			fmt.Fprint(os.Stderr, err2)
+			log.Print(err2)
 		}
 	}()
 
@@ -116,7 +116,7 @@ func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath st
 
 	defer func() {
 		if err2 := fProductList.Close(); err2 != nil {
-			fmt.Fprint(os.Stderr, err2)
+			log.Print(err2)
 		}
 	}()
 
@@ -157,7 +157,7 @@ func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath st
 
 		defer func() {
 			if err3 := res.Body.Close(); err3 != nil {
-				fmt.Fprint(os.Stderr, err3)
+				log.Print(err3)
 			}
 		}()
 
@@ -177,7 +177,7 @@ func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath st
 
 // CacheIndex populates a cicada index.
 func CacheIndex(indexDirPath string, indexCacheConfigPath string, indexProductsListFilePath string, indexProductsDirPath string) error {
-	log.Printf("Caching new default configuration...\n")
+	log.Println("Caching new default configuration...")
 
 	f, err := os.Create(indexCacheConfigPath)
 
@@ -199,7 +199,7 @@ func CacheIndex(indexDirPath string, indexCacheConfigPath string, indexProductsL
 
 	defer func() {
 		if err2 := res.Body.Close(); err2 != nil {
-			fmt.Fprint(os.Stderr, err2)
+			log.Print(err2)
 		}
 	}()
 
@@ -211,7 +211,7 @@ func CacheIndex(indexDirPath string, indexCacheConfigPath string, indexProductsL
 
 	defer func() {
 		if err2 := f.Close(); err2 != nil {
-			fmt.Fprint(os.Stderr, err2)
+			log.Print(err2)
 		}
 	}()
 
@@ -336,14 +336,14 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 	schedules, ok := o.components[identityOs]
 
 	if !ok {
-		fmt.Fprintf(os.Stderr, "no known support schedule found for os: %v", identityOs)
+		log.Printf("no known support schedule found for os: %v", identityOs)
 		return nil, nil
 	}
 
 	query, ok := o.VersionQueries[identityOs]
 
 	if !ok {
-		fmt.Fprintf(os.Stderr, "no known version query command found for os: %v", identityOs)
+		log.Printf("no known version query command found for os: %v", identityOs)
 		return nil, nil
 	}
 
