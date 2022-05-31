@@ -40,3 +40,7 @@ FreeBSD
 # CONTRIBUTING
 
 For more information about developing cicada itself, see [DEVELOPMENT.md](DEVELOPMENT.md).
+
+# CREDITS
+
+* [endoflife.date](https://endoflife.date/) for support lifetime data
