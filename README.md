@@ -27,6 +27,8 @@ For enterprise systems, a variety of tools are available to identify specific vu
 
 Following classical UNIX conventions, cicada often emits no output of any kind, and returns zero exit status, in the case where no non-LTS components are identified. To see a list of supported versions that cicada identifies on your machine, you may run `cicada -debug` to show additional logs.
 
+cicada is future compatible: Any software components targeting developmental, git HEAD versions should not trigger false alarms. Maybe you're already consuming clang tip, for example, which is well ahead of the pack. For the rest of us, we can relax and stick to stable, LTS releases. Let cicada guide you to successful operation.
+
 # DOCUMENTATION
 
 https://godoc.org/github.com/mcandre/cicada
