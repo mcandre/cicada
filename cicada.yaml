@@ -84,11 +84,20 @@ version_queries:
   nodejs:
     command: ["node", "--version"]
     pattern: "^v(?P<Version>[0-9\\.]+)$"
+  openbsd:
+    command: ["uname", "-r"]
+    pattern: "^(?P<Version>[0-9\\.]+).*$"
   openssl:
     command: ["openssl", "version"]
     pattern: "^.+ (?P<Version>[0-9\\.]+)$"
+  opensuse:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
   perl:
     command: ["perl", "-e", "print $];"]
+  php:
+    command: ["php", "-v"]
+    pattern: "^PHP (?P<Version>[0-9\\.]+).+$"
   python:
     command: ["python", "-c", "import platform; print(platform.python_version())"]
   rails:
