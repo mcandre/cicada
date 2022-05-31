@@ -1,6 +1,6 @@
 # cicada: Long Term Support Analyzer
 
-*Shed your skin anew. Find the right persona.*
+*Shed your skin anew.*
 
 # EXAMPLE
 
