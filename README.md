@@ -23,6 +23,10 @@ Following classical UNIX conventions, cicada often emits no output of any kind, 
 
 https://godoc.org/github.com/mcandre/cicada
 
+# DOWNLOAD
+
+https://github.com/mcandre/cicada/releases
+
 # INSTALL FROM SOURCE
 
 ```console
