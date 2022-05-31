@@ -336,7 +336,7 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 	version := *versionP
 
 	if o.Debug {
-		log.Printf("detected os: %v v%v\n", identityOs, version.String())
+		log.Printf("detected os %v v%v\n", identityOs, version.String())
 	}
 
 	return ScanComponent(identityOs, version, schedules, t), nil

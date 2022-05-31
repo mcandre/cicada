@@ -58,8 +58,32 @@ version_queries:
   linux:
     command: ["uname", "-r"]
     pattern: "^(?P<Version>[0-9\\.]+).*$"
+  linuxmint:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
   macos:
     command: ["sw_vers", "-ProductVersion"]
+  mariadb:
+    command: ["mariadb", "--version"]
+    pattern: "mariadb\\s+Ver\\s+(?P<Version>[0-9\\.]).+$"
+  mongodb:
+    command: ["mongod", "--version"]
+    pattern: "^db version v(?P<Version>[0-9\\.]+)$"
+  mssqlserver:
+    command: ["sqlcmd.exe", "-E", "-Q", "SELECT @@VERSION;"]
+    pattern: "^Microsoft SQL Server\\s+.+\\s+\\(.+\\)\\s+\\(.+\\)\\s+(?P<Version>[0-9\\.]+).+$"
+  mysql:
+    command: ["mysql", "-V"]
+    pattern: "mysql\\s+Ver\\s+(?P<Version>[0-9\\.]).+$"
+  nginx:
+    command: ["nginx", "-v"]
+    pattern: "^nginx version: nginx/(?P<Version>[0-9\\.]+)$"
+  nixos:
+    command: ["nixos-version"]
+    pattern: "^(?P<version>[0-9\\.]+).+$"
+  nodejs:
+    command: ["node", "--version"]
+    pattern: "^v(?P<Version>[0-9\\.]+)$"
   openssl:
     command: ["openssl", "version"]
     pattern: "^.+ (?P<Version>[0-9\\.]+)$"
