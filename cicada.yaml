@@ -125,5 +125,5 @@ version_queries:
     command: ["lsb_release", "-r"]
     pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
   windows:
-    command: ["systeminfo"]
-    pattern: "^OS Version:\\s+(?P<Version>[0-9\\.]+).+$"
+    command: ["wmic", "os", "get", "Caption", "/value"]
+    pattern: "^Caption=.+(?P<Version>[0-9\\.]+).*$"
