@@ -336,13 +336,15 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 	schedules, ok := o.components[identityOs]
 
 	if !ok {
-		return nil, fmt.Errorf("no support schedule found for os: %v", identityOs)
+		fmt.Fprintf(os.Stderr, "no known support schedule found for os: %v", identityOs)
+		return nil, nil
 	}
 
 	query, ok := o.VersionQueries[identityOs]
 
 	if !ok {
-		return nil, fmt.Errorf("no version query command found for os: %v", identityOs)
+		fmt.Fprintf(os.Stderr, "no known version query command found for os: %v", identityOs)
+		return nil, nil
 	}
 
 	versionString, err := query.Execute()
