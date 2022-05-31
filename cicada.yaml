@@ -115,6 +115,9 @@ version_queries:
   rhel:
     command: ["lsb_release", "-r"]
     pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  rocky-linux:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
   ruby:
     command: ["ruby", "-v"]
     pattern: "^ruby (?P<Version>[0-9\\.]+).+$"
