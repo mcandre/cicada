@@ -124,3 +124,6 @@ version_queries:
   ubuntu:
     command: ["lsb_release", "-r"]
     pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  windows:
+    command: ["systeminfo"]
+    pattern: "^OS Version:\\s+(?P<Version>[0-9\\.]+).+$"
