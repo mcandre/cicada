@@ -126,4 +126,4 @@ version_queries:
     pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
   windows:
     command: ["wmic", "os", "get", "Caption", "/value"]
-    pattern: "^Caption=.+(?P<Version>[0-9\\.]+).*$"
+    pattern: "Caption=Microsoft Windows (?P<Version>[0-9\\.]+)"
