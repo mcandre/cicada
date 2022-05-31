@@ -101,11 +101,17 @@ version_queries:
   postgresql:
     command: ["postgres", "-V"]
     pattern: "^postgres \\(PostgreSQL\\) (?P<Version>[0-9\\.]+)$"
+  powershell:
+    command: ["powershell", "-Command", "$PSVersionTable"]
+    pattern: "^PSVersion\\s+(?P<Version>[0-9\\.]+)$"
   python:
     command: ["python", "-c", "import platform; print(platform.python_version())"]
   rails:
     command: ["rails", "-v"]
     pattern: "(?s)^Rails (?P<Version>[0-9\\.]+)$"
+  redis:
+    command: ["redis-server", "--version"]
+    pattern: "^Redis server v=(?P<Version>[0-9\\.]+).+$"
   rhel:
     command: ["lsb_release", "-r"]
     pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
