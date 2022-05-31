@@ -14,6 +14,7 @@ var SemVerPattern = regexp.MustCompile(`^[0-9\.]+$`)
 // ProductRecords models endoflife.date product detail records.
 type ProductRecords []map[string]interface{}
 
+// ProductRecordsToSchedules converts ProductRecords to Schedule arrays.
 func ProductRecordsToSchedules(name string, records ProductRecords) ([]Schedule, error) {
 	var schedules []Schedule
 
@@ -45,7 +46,7 @@ func ProductRecordsToSchedules(name string, records ProductRecords) ([]Schedule,
 		}
 
 		schedule := Schedule{
-			Name: name,
+			Name:    name,
 			Version: *version,
 		}
 

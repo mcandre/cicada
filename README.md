@@ -15,4 +15,12 @@ cicada assists engineers with keeping software up to date. cicada warns when maj
 
 Following classical UNIX conventions, cicada emits no output and returns zero exit status in the event that no non-LTS components are identified.
 
+# RUNTIME REQUIREMENTS
+
+(N/A)
+
+# CONTRIBUTING
+
+For more information about developing cicada itself, see [DEVELOPMENT.md](DEVELOPMENT.md).
+
 ![cicada molt](cicada.png)

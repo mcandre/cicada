@@ -17,11 +17,11 @@ import (
 	"time"
 )
 
-// IndexUrl denotes the location of the LTS index resource.
-const IndexUrl = "https://raw.githubusercontent.com/mcandre/cicada/main/cicada.yaml"
+// IndexURL denotes the location of the LTS index resource.
+const IndexURL = "https://raw.githubusercontent.com/mcandre/cicada/main/cicada.yaml"
 
-// EndOfLifeBaseUrl denotes the base location of the endoflife.date service.
-const EndOfLifeBaseUrl = "https://endoflife.date/api"
+// EndOfLifeBaseURL denotes the base location of the endoflife.date service.
+const EndOfLifeBaseURL = "https://endoflife.date/api"
 
 // ProductsListResourceBase denotes the location of the products list resource.
 const ProductsListResourceBase = "all.json"
@@ -85,7 +85,11 @@ func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath st
 
 	fProductList, err := os.Create(indexProductsListFilePath)
 
-	u := fmt.Sprintf("%v/%v", EndOfLifeBaseUrl, ProductsListResourceBase)
+	if err != nil {
+		return err
+	}
+
+	u := fmt.Sprintf("%v/%v", EndOfLifeBaseURL, ProductsListResourceBase)
 	res, err := http.Get(u)
 
 	if err != nil {
@@ -98,13 +102,21 @@ func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath st
 		return fmt.Errorf("get: %v returned status code: %v", u, statusCode)
 	}
 
-	defer res.Body.Close()
+	defer func() {
+		if err2 := res.Body.Close(); err2 != nil {
+			fmt.Fprint(os.Stderr, err2)
+		}
+	}()
 
 	body, err := io.ReadAll(res.Body)
 
+	if err != nil {
+		return err
+	}
+
 	defer func() {
 		if err2 := fProductList.Close(); err2 != nil {
-			fmt.Fprintf(os.Stderr, err2.Error())
+			fmt.Fprint(os.Stderr, err2)
 		}
 	}()
 
@@ -130,7 +142,7 @@ func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath st
 			return err2
 		}
 
-		u2 := fmt.Sprintf("%v/%v", EndOfLifeBaseUrl, productBase)
+		u2 := fmt.Sprintf("%v/%v", EndOfLifeBaseURL, productBase)
 		res, err2 := http.Get(u2)
 
 		if err2 != nil {
@@ -143,7 +155,11 @@ func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath st
 			return fmt.Errorf("get: %v returned status code: %v", u2, statusCode)
 		}
 
-		defer res.Body.Close()
+		defer func() {
+			if err3 := res.Body.Close(); err3 != nil {
+				fmt.Fprint(os.Stderr, err3)
+			}
+		}()
 
 		body, err2 := io.ReadAll(res.Body)
 
@@ -169,7 +185,7 @@ func CacheIndex(indexDirPath string, indexCacheConfigPath string, indexProductsL
 		return err
 	}
 
-	res, err := http.Get(IndexUrl)
+	res, err := http.Get(IndexURL)
 
 	if err != nil {
 		return err
@@ -178,16 +194,24 @@ func CacheIndex(indexDirPath string, indexCacheConfigPath string, indexProductsL
 	statusCode := res.StatusCode
 
 	if statusCode < 200 || statusCode > 299 {
-		return fmt.Errorf("get: %v returned status code: %v", IndexUrl, statusCode)
+		return fmt.Errorf("get: %v returned status code: %v", IndexURL, statusCode)
 	}
 
-	defer res.Body.Close()
+	defer func() {
+		if err2 := res.Body.Close(); err2 != nil {
+			fmt.Fprint(os.Stderr, err2)
+		}
+	}()
 
 	body, err := io.ReadAll(res.Body)
 
+	if err != nil {
+		return err
+	}
+
 	defer func() {
 		if err2 := f.Close(); err2 != nil {
-			fmt.Fprintf(os.Stderr, err2.Error())
+			fmt.Fprint(os.Stderr, err2)
 		}
 	}()
 
@@ -224,8 +248,8 @@ func Load(update bool) (*Index, error) {
 
 	indexDirPath := *indexDirPathP
 
-	if err := os.MkdirAll(indexDirPath, os.ModePerm); err != nil {
-		return nil, err
+	if err2 := os.MkdirAll(indexDirPath, os.ModePerm); err2 != nil {
+		return nil, err2
 	}
 
 	indexCacheConfigPathP, err := IndexCacheConfigPath()
@@ -312,13 +336,13 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 	schedules, ok := o.components[identityOs]
 
 	if !ok {
-		return nil, fmt.Errorf("no support schedule found for os: %v\n", identityOs)
+		return nil, fmt.Errorf("no support schedule found for os: %v", identityOs)
 	}
 
 	query, ok := o.VersionQueries[identityOs]
 
 	if !ok {
-		return nil, fmt.Errorf("no version query command found for os: %v\n", identityOs)
+		return nil, fmt.Errorf("no version query command found for os: %v", identityOs)
 	}
 
 	versionString, err := query.Execute()
@@ -342,6 +366,9 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 	return ScanComponent(identityOs, version, schedules, t), nil
 }
 
+// ScanApplication checks executables for non-LTS versions.
+//
+// If the executable is not found, a warning may not be emitted.
 func (o Index) ScanApplication(executable string, schedules []Schedule, t time.Time) (*string, error) {
 	if _, err := exec.LookPath(executable); err != nil {
 		return nil, nil
@@ -400,7 +427,7 @@ func (o Index) ScanApplications(t time.Time) ([]string, error) {
 func (o Index) Scan() ([]string, error) {
 	var warnings []string
 	tNow := time.Now()
-	t := tNow.AddDate(0, -1 * LeadMonths, 0)
+	t := tNow.AddDate(0, -1*LeadMonths, 0)
 	warningOs, err := o.ScanOs(t)
 
 	if err != nil {

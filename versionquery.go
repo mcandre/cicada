@@ -23,7 +23,7 @@ type VersionQuery struct {
 func (o VersionQuery) MarshalYAML() ([]byte, error) {
 	type VersionQueryAlias struct {
 		Command []string `yaml:"command"`
-		Pattern *string `yaml:"pattern,omitempty"`
+		Pattern *string  `yaml:"pattern,omitempty"`
 	}
 
 	var aux VersionQueryAlias
@@ -37,7 +37,7 @@ func (o VersionQuery) MarshalYAML() ([]byte, error) {
 func (o *VersionQuery) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	type VersionQueryAlias struct {
 		Command []string `yaml:"command"`
-		Pattern *string `yaml:"pattern,omitempty"`
+		Pattern *string  `yaml:"pattern,omitempty"`
 	}
 
 	var aux VersionQueryAlias
@@ -81,7 +81,7 @@ func (o VersionQuery) Execute() (*string, error) {
 		matches := o.Pattern.FindStringSubmatch(versionString)
 		versionIndex := o.Pattern.SubexpIndex("Version")
 
-		if len(matches) < versionIndex + 1 {
+		if len(matches) < versionIndex+1 {
 			return nil, nil
 		}
 

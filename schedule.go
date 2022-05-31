@@ -42,8 +42,8 @@ func (o Schedule) Match(v semver.Version) bool {
 // MarshalYAML encodes schedules.
 func (o Schedule) MarshalYAML() ([]byte, error) {
 	type ScheduleAlias struct {
-		Name string `yaml:"name"`
-		Version string `yaml:"version"`
+		Name       string `yaml:"name"`
+		Version    string `yaml:"version"`
 		Expiration string `yaml:"expiration,omitempty"`
 	}
 
@@ -61,8 +61,8 @@ func (o Schedule) MarshalYAML() ([]byte, error) {
 // UnmarshalYAML decodes schedules.
 func (o *Schedule) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	type ScheduleAlias struct {
-		Name string `yaml:"name"`
-		Version string `yaml:"version"`
+		Name       string `yaml:"name"`
+		Version    string `yaml:"version"`
 		Expiration string `yaml:"expiration,omitempty"`
 	}
 
@@ -93,6 +93,7 @@ func (o *Schedule) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return nil
 }
 
+// ScanComponent checks whether the given component is end of life.
 func ScanComponent(name string, version semver.Version, schedules []Schedule, t time.Time) *string {
 	for _, schedule := range schedules {
 		if !schedule.Match(version) {
