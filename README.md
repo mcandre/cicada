@@ -1,6 +1,8 @@
 # cicada: Long Term Support Analyzer
 
-*Shed your skin anew.*
+![cicada molt](cicada.png)
+
+> Shed your skin anew.
 
 # EXAMPLE
 
@@ -38,5 +40,3 @@ FreeBSD
 # CONTRIBUTING
 
 For more information about developing cicada itself, see [DEVELOPMENT.md](DEVELOPMENT.md).
-
-![cicada molt](cicada.png)
