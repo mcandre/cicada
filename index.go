@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"os/user"
 	"path"
 	"time"
 )
@@ -60,26 +59,14 @@ type Index struct {
 }
 
 // IndexCacheDirPath yields the location of cicada metadata directory.
-func IndexCacheDirPath() (*string, error) {
-	user, err := user.Current()
-
-	if err != nil {
-		return nil, err
-	}
-
-	pth := path.Join(user.HomeDir, IndexCacheRoot)
+func IndexCacheDirPath(cwd string) (*string, error) {
+	pth := path.Join(cwd, IndexCacheRoot)
 	return &pth, nil
 }
 
 // IndexCacheConfigPath yields the location of the cicada configuration.
-func IndexCacheConfigPath() (*string, error) {
-	user, err := user.Current()
-
-	if err != nil {
-		return nil, err
-	}
-
-	pth := path.Join(user.HomeDir, IndexCacheRoot, IndexCacheBase)
+func IndexCacheConfigPath(cwd string) (*string, error) {
+	pth := path.Join(cwd, IndexCacheRoot, IndexCacheBase)
 	return &pth, nil
 }
 
@@ -181,46 +168,48 @@ func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath st
 
 // CacheIndex populates a cicada index.
 func CacheIndex(indexDirPath string, indexCacheConfigPath string, indexProductsListFilePath string, indexProductsDirPath string) error {
-	log.Println("Caching new default configuration...")
+	_, err := os.Stat(indexCacheConfigPath)
 
-	f, err := os.Create(indexCacheConfigPath)
+	if os.IsNotExist(err) {
+		f, err2 := os.Create(indexCacheConfigPath)
 
-	if err != nil {
-		return err
-	}
-
-	res, err := http.Get(IndexURL)
-
-	if err != nil {
-		return err
-	}
-
-	statusCode := res.StatusCode
-
-	if statusCode < 200 || statusCode > 299 {
-		return fmt.Errorf("get: %v returned status code: %v", IndexURL, statusCode)
-	}
-
-	defer func() {
-		if err2 := res.Body.Close(); err2 != nil {
-			log.Print(err2)
+		if err2 != nil {
+			return err2
 		}
-	}()
 
-	body, err := io.ReadAll(res.Body)
+		res, err2 := http.Get(IndexURL)
 
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		if err2 := f.Close(); err2 != nil {
-			log.Print(err2)
+		if err2 != nil {
+			return err2
 		}
-	}()
 
-	if _, err := f.Write(body); err != nil {
-		return err
+		statusCode := res.StatusCode
+
+		if statusCode < 200 || statusCode > 299 {
+			return fmt.Errorf("get: %v returned status code: %v", IndexURL, statusCode)
+		}
+
+		defer func() {
+			if err3 := res.Body.Close(); err3 != nil {
+				log.Print(err3)
+			}
+		}()
+
+		body, err2 := io.ReadAll(res.Body)
+
+		if err2 != nil {
+			return err2
+		}
+
+		defer func() {
+			if err3 := f.Close(); err3 != nil {
+				log.Print(err3)
+			}
+		}()
+
+		if _, err3 := f.Write(body); err3 != nil {
+			return err3
+		}
 	}
 
 	return CacheLifetimeData(indexProductsListFilePath, indexProductsDirPath)
@@ -244,7 +233,13 @@ func (o Index) Validate() error {
 
 // Load generates a partial LTS index.
 func Load(update bool) (*Index, error) {
-	indexDirPathP, err := IndexCacheDirPath()
+	cwd, err := os.Getwd()
+
+	if err != nil {
+		return nil, err
+	}
+
+	indexDirPathP, err := IndexCacheDirPath(cwd)
 
 	if err != nil {
 		return nil, err
@@ -256,7 +251,7 @@ func Load(update bool) (*Index, error) {
 		return nil, err2
 	}
 
-	indexCacheConfigPathP, err := IndexCacheConfigPath()
+	indexCacheConfigPathP, err := IndexCacheConfigPath(cwd)
 
 	if err != nil {
 		return nil, err
@@ -483,7 +478,13 @@ func (o Index) Scan() ([]string, error) {
 
 // Clean removes artifacts created during cicada runs.
 func Clean() error {
-	indexCacheDirPath, err := IndexCacheDirPath()
+	cwd, err := os.Getwd()
+
+	if err != nil {
+		return err
+	}
+
+	indexCacheDirPath, err := IndexCacheDirPath(cwd)
 
 	if err != nil {
 		return err

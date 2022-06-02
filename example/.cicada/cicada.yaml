@@ -1,0 +1,132 @@
+---
+version_queries:
+  almalinux:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  alpine:
+    command: ["grep", "VERSION_ID", "/etc/os-release"]
+    pattern: "^VERSION_ID=(?P<Version>[0-9\\.]+)$"
+  amazon-linux:
+    command: ["cat", "/etc/system-release"]
+    pattern: "^Amazon Linux release (?P<Version>[0-9\\.]+).+$"
+  ansible:
+    command: ["ansible", "--version"]
+    pattern: "^ansible \\[core (?P<Version>[0-9\\.]+)\\]$"
+  apache:
+    command: ["httpd", "-v"]
+    pattern: "^Server version: Apache/(?P<Version>[0-9\\.]+).+$"
+  centos:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  consul:
+    command: ["consul", "version"]
+    pattern: "^Consul v(?P<Version>[0-9\\.]+)$"
+  debian:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  django:
+    command: ["django-admin", "--version"]
+  docker-engine:
+    command: ["docker", "version", "--format", "{{.Client.Version}}"]
+  drupal:
+    command: ["drush", "status"]
+    pattern: "^Drupal version\\s*:\\s*(?P<Version>[0-9\\.]+).*$"
+  elasticsearch:
+    command: ["elasticsearch", "--version"]
+    pattern: "^Version: (?P<Version>[0-9\\.]+).*$"
+  elixir:
+    command: ["elixir", "-v"]
+    pattern: "^Elixir (?P<Version>[0-9\\.]+).+$"
+  fedora:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  ffmpeg:
+    command: ["ffmpeg", "--version"]
+    pattern: "ffmpeg version (?P<Version>[0-9\\.]+).+$"
+  firefox:
+    command: ["firefox", "--version"]
+    pattern: "^Mozilla Firefox (?P<Version>[0-9\\.]+)$"
+  freebsd:
+    command: ["uname", "-r"]
+    pattern: "^(?P<Version>[0-9\\.]+).*$"
+  go:
+    command: ["go", "version"]
+    pattern: "^go version go(?P<Version>[0-9\\.]+) .+$"
+  java:
+    command: ["java", "-version"]
+    pattern: "^java version \"(?P<Version>[0-9\\.]+)\"$"
+  linux:
+    command: ["uname", "-r"]
+    pattern: "^(?P<Version>[0-9\\.]+).*$"
+  linuxmint:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  macos:
+    command: ["sw_vers", "-ProductVersion"]
+  mariadb:
+    command: ["mariadb", "--version"]
+    pattern: "mariadb\\s+Ver\\s+(?P<Version>[0-9\\.]).+$"
+  mongodb:
+    command: ["mongod", "--version"]
+    pattern: "^db version v(?P<Version>[0-9\\.]+)$"
+  mssqlserver:
+    command: ["sqlcmd.exe", "-E", "-Q", "SELECT @@VERSION;"]
+    pattern: "^Microsoft SQL Server\\s+.+\\s+\\(.+\\)\\s+\\(.+\\)\\s+(?P<Version>[0-9\\.]+).+$"
+  mysql:
+    command: ["mysql", "-V"]
+    pattern: "mysql\\s+Ver\\s+(?P<Version>[0-9\\.]).+$"
+  nginx:
+    command: ["nginx", "-v"]
+    pattern: "^nginx version: nginx/(?P<Version>[0-9\\.]+)$"
+  nixos:
+    command: ["nixos-version"]
+    pattern: "^(?P<version>[0-9\\.]+).+$"
+  nodejs:
+    command: ["node", "--version"]
+    pattern: "^v(?P<Version>[0-9\\.]+)$"
+  openbsd:
+    command: ["uname", "-r"]
+    pattern: "^(?P<Version>[0-9\\.]+).*$"
+  openssl:
+    command: ["openssl", "version"]
+    pattern: "^.+ (?P<Version>[0-9\\.]+)$"
+  opensuse:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  perl:
+    command: ["perl", "-e", "print $];"]
+  php:
+    command: ["php", "-v"]
+    pattern: "^PHP (?P<Version>[0-9\\.]+).+$"
+  postgresql:
+    command: ["postgres", "-V"]
+    pattern: "^postgres \\(PostgreSQL\\) (?P<Version>[0-9\\.]+)$"
+  powershell:
+    command: ["powershell", "-Command", "$PSVersionTable"]
+    pattern: "^PSVersion\\s+(?P<Version>[0-9\\.]+)$"
+  python:
+    command: ["python", "-c", "import platform; print(platform.python_version())"]
+  rails:
+    command: ["rails", "-v"]
+    pattern: "(?s)^Rails (?P<Version>[0-9\\.]+)$"
+  redis:
+    command: ["redis-server", "--version"]
+    pattern: "^Redis server v=(?P<Version>[0-9\\.]+).+$"
+  rhel:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  rocky-linux:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  ruby:
+    command: ["ruby", "-v"]
+    pattern: "^ruby (?P<Version>[0-9\\.]+).+$"
+  ubuntu:
+    command: ["lsb_release", "-r"]
+    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  windows:
+    command: ["wmic", "os", "get", "Caption", "/value"]
+    pattern: "Caption=Microsoft Windows (?P<Version>[0-9\\.]+)"
+  yocto:
+    command: ["sh", "-c", "grep DISTRO_VERSION $POKY-DIR/meta-poky/conf/distro/poky.conf"]
+    pattern: "^DISTRO_VERSION = \\\"(?P<Version>[0-9\\.]+)\\\"$"
