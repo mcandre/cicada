@@ -39,6 +39,10 @@ https://github.com/mcandre/cicada/releases
 $ go install github.com/mcandre/cicada/cmd/cicada@latest
 ```
 
+# CONFIGURATION
+
+See [example/cicada.yaml](example/cicada.yaml).
+
 # LICENSE
 
 FreeBSD

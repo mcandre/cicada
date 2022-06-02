@@ -30,7 +30,9 @@ const ProductsListResourceBase = "all.json"
 const IndexCacheRoot = ".cicada"
 
 // IndexCacheBase denotes the base path of the cached LTS index,
-// relative to IndexCacheRoot.
+// relative to the current working directory.
+//
+// For example, a software project top level directory.
 const IndexCacheBase = "cicada.yaml"
 
 // IndexProductsListBase denotes the base path of the products list file,
@@ -66,7 +68,7 @@ func IndexCacheDirPath(cwd string) (*string, error) {
 
 // IndexCacheConfigPath yields the location of the cicada configuration.
 func IndexCacheConfigPath(cwd string) (*string, error) {
-	pth := path.Join(cwd, IndexCacheRoot, IndexCacheBase)
+	pth := path.Join(cwd, IndexCacheBase)
 	return &pth, nil
 }
 
@@ -211,7 +213,7 @@ func Load(update bool) (*Index, error) {
 	indexCacheConfigPath := *indexCacheConfigPathP
 
 	if _, err2 := os.Stat(indexCacheConfigPath); os.IsNotExist(err2) {
-		return nil, fmt.Errorf("missing configuration: %v", path.Join(IndexCacheRoot, IndexCacheBase))
+		return nil, fmt.Errorf("missing configuration: %v", IndexCacheBase)
 	}
 
 	indexProductsListFilePath := path.Join(indexDirPath, IndexProductsListBase)
