@@ -11,6 +11,8 @@ cicada scans your computer for outdated components.
 # EXAMPLE
 
 ```console
+$ cd example
+
 $ cicada
 warning: end of life for ruby v2.6.8 on 2022-03-31
 ```
