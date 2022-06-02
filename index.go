@@ -166,55 +166,6 @@ func CacheLifetimeData(indexProductsListFilePath string, indexProductsDirPath st
 	return nil
 }
 
-// CacheIndex populates a cicada index.
-func CacheIndex(indexDirPath string, indexCacheConfigPath string, indexProductsListFilePath string, indexProductsDirPath string) error {
-	_, err := os.Stat(indexCacheConfigPath)
-
-	if os.IsNotExist(err) {
-		f, err2 := os.Create(indexCacheConfigPath)
-
-		if err2 != nil {
-			return err2
-		}
-
-		res, err2 := http.Get(IndexURL)
-
-		if err2 != nil {
-			return err2
-		}
-
-		statusCode := res.StatusCode
-
-		if statusCode < 200 || statusCode > 299 {
-			return fmt.Errorf("get: %v returned status code: %v", IndexURL, statusCode)
-		}
-
-		defer func() {
-			if err3 := res.Body.Close(); err3 != nil {
-				log.Print(err3)
-			}
-		}()
-
-		body, err2 := io.ReadAll(res.Body)
-
-		if err2 != nil {
-			return err2
-		}
-
-		defer func() {
-			if err3 := f.Close(); err3 != nil {
-				log.Print(err3)
-			}
-		}()
-
-		if _, err3 := f.Write(body); err3 != nil {
-			return err3
-		}
-	}
-
-	return CacheLifetimeData(indexProductsListFilePath, indexProductsDirPath)
-}
-
 // ValidateVersionQueries ensures version query data integrity.
 func (o Index) ValidateVersionQueries() error {
 	for component, query := range o.VersionQueries {
@@ -259,13 +210,17 @@ func Load(update bool) (*Index, error) {
 
 	indexCacheConfigPath := *indexCacheConfigPathP
 
+	if _, err2 := os.Stat(indexCacheConfigPath); os.IsNotExist(err2) {
+		return nil, fmt.Errorf("missing configuration: %v", path.Join(IndexCacheRoot, IndexCacheBase))
+	}
+
 	indexProductsListFilePath := path.Join(indexDirPath, IndexProductsListBase)
 	indexProductsDirPath := path.Join(indexDirPath, IndexProductsDirBase)
 
-	_, err = os.Stat(indexCacheConfigPath)
+	_, err = os.Stat(indexProductsListFilePath)
 
 	if update || os.IsNotExist(err) {
-		if err2 := CacheIndex(indexDirPath, indexCacheConfigPath, indexProductsListFilePath, indexProductsDirPath); err2 != nil {
+		if err2 := CacheLifetimeData(indexProductsListFilePath, indexProductsDirPath); err2 != nil {
 			return nil, err2
 		}
 	}
