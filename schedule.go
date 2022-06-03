@@ -5,6 +5,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -31,18 +32,23 @@ type Schedule struct {
 }
 
 // Match reports whether a schedule applies to the given software component version.
-func (o Schedule) Match(v semver.Version) bool {
+//
+// specificity indicates the number of elements in the original v string.
+//
+// For example, original version string "1" has specificity 1.
+// Original version string "1.1" has specificity 2.
+// Original version string "1.1.1" has specificity 3.
+// And so on.
+func (o Schedule) Match(v semver.Version, specificity int) bool {
 	if v.Major() != o.Version.Major() {
 		return false
 	}
 
-	minor := o.Version.Minor()
-
-	if minor == 0 {
+	if specificity < 1 {
 		return true
 	}
 
-	return v.Minor() == minor
+	return v.Minor() == o.Version.Minor()
 }
 
 // MarshalYAML encodes schedules.
@@ -101,8 +107,10 @@ func (o *Schedule) UnmarshalYAML(value *yaml.Node) error {
 
 // ScanComponent checks whether the given component is end of life.
 func ScanComponent(name string, version semver.Version, schedules []Schedule, t time.Time) *string {
+	specificity := strings.Count(version.Original(), ".")
+
 	for _, schedule := range schedules {
-		if !schedule.Match(version) {
+		if !schedule.Match(version, specificity) {
 			continue
 		}
 
