@@ -51,6 +51,17 @@ type Index struct {
 	// Quiet skips system executables (default: false).
 	Quiet bool `yaml:"quiet,omitempty"`
 
+	// LeadMonths provides a margin of time to migrate
+	// before a support timeline formally ends.
+	//
+	// Not too short that developers fail to migrate,
+	// not too long that developers forget to migrate.
+	//
+	// Negative values are treated as a reset to default value.
+	//
+	// (default: 1)
+	LeadMonths int `yaml:"lead_months,omitempty"`
+
 	// VersionQueries denotes command line queries for retrieving component versions, in exec-like format,
 	// keyed on executable base path.
 	VersionQueries map[string]VersionQuery `yaml:"version_queries"`
@@ -244,6 +255,10 @@ func Load(update bool) (*Index, error) {
 		return nil, err2
 	}
 
+	if index.LeadMonths < 0 {
+		index.LeadMonths = DefaultLeadMonths
+	}
+
 	productListBuf, err := os.ReadFile(indexProductsListFilePath)
 
 	if err != nil {
@@ -412,7 +427,7 @@ func (o Index) ScanApplications(t time.Time) ([]string, error) {
 func (o Index) Scan() ([]string, error) {
 	var warnings []string
 	tNow := time.Now()
-	t := tNow.AddDate(0, -1*LeadMonths, 0)
+	t := tNow.AddDate(0, o.LeadMonths, 0)
 	warningOs, err := o.ScanOs(t)
 
 	if err != nil {

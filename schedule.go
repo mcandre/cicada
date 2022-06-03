@@ -109,7 +109,7 @@ func ScanComponent(name string, version semver.Version, schedules []Schedule, t 
 		if schedule.Expiration != nil {
 			expiration := *schedule.Expiration
 
-			if t.After(expiration) {
+			if t.Equal(expiration) || t.After(expiration) {
 				message := fmt.Sprintf("end of life for %v v%v on %v", name, version.String(), expiration.Format(RFC3339DateFormat))
 				return &message
 			}

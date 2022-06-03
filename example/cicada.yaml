@@ -2,7 +2,7 @@
 # When enabled, `debug` emits additional logs.
 #
 # debug: true
-
+#
 # When enabled, `quiet` skips scanning of
 # any software components found in non-system binary directories.
 #
@@ -12,7 +12,17 @@
 # This option is not recommended for use in CI/CD, Docker containers, VM's.
 #
 # quiet: true
-
+#
+# The `lead_months` setting controls the early warning timing
+# relative to the formal support timeline termination date.
+#
+# Negative values reset to the default value (1).
+#
+# Not too short that developers fail to migrate,
+# not too long that developers forget to migrate.
+#
+# lead_months: 1
+#
 # The `version_queries` section informs cicada how to collect live version information
 # from the machine. The live versions are then compared with support timelines from the endoflife.date database.
 #
