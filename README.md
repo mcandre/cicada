@@ -43,7 +43,7 @@ $ go install github.com/mcandre/cicada/cmd/cicada@latest
 
 # CONFIGURATION
 
-See [example/cicada.yaml](example/cicada.yaml).
+See [CONFIGURATION.md](CONFIGURATION.md).
 
 # LICENSE
 
