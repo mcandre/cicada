@@ -39,6 +39,10 @@ type Schedule struct {
 // Original version string "1.1" has specificity 2.
 // Original version string "1.1.1" has specificity 3.
 // And so on.
+//
+// Note that degenerate versions may not necessarily behave as expected.
+// For example, ".1" (corresponding with "0.1"),
+// Or "1." (corresponding with "1.0").
 func (o Schedule) Match(v semver.Version, specificity int) bool {
 	if v.Major() != o.Version.Major() {
 		return false
