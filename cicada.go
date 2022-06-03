@@ -1,7 +1,7 @@
 package cicada
 
 // Version is semver.
-const Version = "0.0.5"
+const Version = "0.0.6"
 
 // DefaultLeadMonths provides additional time for engineers
 // to implement version migrations prior to final end of life.
