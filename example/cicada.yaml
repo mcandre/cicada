@@ -1,5 +1,49 @@
 ---
+# When enabled, `debug` emits additional logs.
+#
+# debug: true
+
+# When enabled, `quiet` skips scanning of
+# any software components found in non-system binary directories.
+#
+# This is useful for reducing linter noise of inactionable,
+# vendor locked components on individual workstations.
+#
+# This option is not recommended for use in CI/CD, Docker containers, VM's.
+#
+# quiet: true
+
+# The `version_queries` section informs cicada how to collect live version information
+# from the machine. The live versions are then compared with support timelines from the endoflife.date database.
+#
+# Each entry in `version_queries` is keyed by a product name
+# from the endoflife.date catalog.
+#
 version_queries:
+  # A version query has a `command`, an exec-like string array.
+  # The command should output the version of the relevant software component.
+  #
+  # django:
+  #   command: ["django-admin", "--version"]
+  #
+  # Before the command is executed, a path lookup is performed on the executable.
+  # If the executable is not found on the machine, then the software component is skipped from scanning.
+  #
+  # Warning: Avoid using shell built-ins and aliases when specifying version query commands,
+  # so that executable path lookup can succeed.
+  # Generally, target portable version query commands that do not depend
+  # on any particular shell implementation, shell configuration, or non-stock software components.
+  #
+  # When the command is executed, the output is always right trimmed of any line ending whitespace.
+  #
+  # Optionally, a version query may specify a Go regular expression pattern.
+  # A pattern helps to extract the software component version string from larger,
+  # more complex text output, in a fast, portable way.
+  #
+  # ubuntu:
+  #   command: ["lsb_release", "-r"]
+  #   pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+  #
   almalinux:
     command: ["lsb_release", "-r"]
     pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"

@@ -6,7 +6,9 @@
 
 # SUMMARY
 
-cicada scans your computer for outdated components.
+cicada scans your computer for software nearing the end of support timelines. Our scans provide actionable results, which you can use to increase the security and reliability of your systems.
+
+Other security tools act like canaries in the coal mine. But by the time the canary dies, it may be too late. cicada takes a different approach. cicada is active, not passive. It provides shrill warnings *before* the mine tumbles.
 
 # EXAMPLE
 
