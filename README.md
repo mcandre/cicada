@@ -6,7 +6,9 @@
 
 # SUMMARY
 
-cicada scans your computer for software nearing the end of support timelines. Our scans provide actionable results, which you can use to increase the security and reliability of your systems.
+cicada scans computers for software nearing the end of their support timelines. This helps everyone keep up with shifting market trends, adopting new capabilities and important security updates at a sustainable pace.
+
+Our scans provide actionable results, which you can use to increase the security and reliability of your systems.
 
 Other security tools act like canaries in the coal mine. But by the time the canary dies, it may be too late. cicada takes a different approach. cicada is active, not passive. It provides shrill warnings *before* the mine tumbles.
 
