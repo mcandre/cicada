@@ -14,6 +14,6 @@ For example, endoflife.date products without an associated entry in `version_que
 
 The Hello World demo project includes an example cicada configuration.
 
-[example/cicada.yaml](example/cidada.yaml)
+[example/cicada.yaml](example/cicada.yaml)
 
 For more detail, see the [index.go](index.go) structure declaration that defines the configuration object model.
