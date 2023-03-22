@@ -1,6 +1,6 @@
 module github.com/mcandre/cicada
 
-go 1.19
+go 1.20
 
 require (
 	github.com/MasterMinds/semver v1.5.0
