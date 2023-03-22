@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -241,7 +240,7 @@ func Load(update bool) (*Index, error) {
 	index := new(Index)
 	index.components = make(map[string][]Schedule)
 
-	contentYAML, err := ioutil.ReadFile(indexCacheConfigPath)
+	contentYAML, err := os.ReadFile(indexCacheConfigPath)
 
 	if err != nil {
 		return nil, err

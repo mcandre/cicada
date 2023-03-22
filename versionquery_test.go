@@ -12,7 +12,7 @@ import (
 func TestVersionQueryYAMLCodec(t *testing.T) {
 	query := cicada.VersionQuery{
 		Command: []string{"lsb_release", "-r"},
-		Pattern: regexp.MustCompile("^Release:\\s+(?P<Version>[0-9\\.]+)$"),
+		Pattern: regexp.MustCompile(`^Release:\s+(?P<Version>[0-9\.]+)$`),
 	}
 
 	queryYAML, err := yaml.Marshal(query)

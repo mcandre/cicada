@@ -13,9 +13,9 @@ func TestIndexYAMLCodec(t *testing.T) {
 	index := cicada.Index{
 		Debug: true,
 		VersionQueries: map[string]cicada.VersionQuery{
-			"ruby": cicada.VersionQuery{
+			"ruby": {
 				Command: []string{"lsb_release", "-r"},
-				Pattern: regexp.MustCompile("^Release:\\s+(?P<Version>[0-9\\.]+)$"),
+				Pattern: regexp.MustCompile(`^Release:\s+(?P<Version>[0-9\.]+)$`),
 			},
 		},
 	}

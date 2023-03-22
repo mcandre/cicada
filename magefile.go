@@ -22,14 +22,23 @@ var Default = Test
 // Audit runs a security audit.
 func Audit() error { return mageextras.SnykTest() }
 
-// Test executes the integration test suite.
-func Test() error {
+// IntegrationTest executes the integration test suite.
+func UnitTest() error { return mageextras.UnitTest() }
+
+// IntegrationTest executes the integration test suite.
+func IntegrationTest() error {
 	mg.Deps(Install)
 
 	cmd := exec.Command("cicada", "-help")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
+}
+
+func Test() error {
+	mg.Deps(UnitTest)
+	mg.Deps(IntegrationTest)
+	return nil
 }
 
 // GoVet runs go vet with shadow checks enabled.
@@ -50,6 +59,9 @@ func Errcheck() error { return mageextras.Errcheck("-blank") }
 // Nakedret runs nakedret.
 func Nakedret() error { return mageextras.Nakedret("-l", "0") }
 
+// Staticcheck runs staticcheck.
+func Staticcheck() error { return mageextras.Staticcheck() }
+
 // Lint runs the lint suite.
 func Lint() error {
 	mg.Deps(GoVet)
@@ -58,6 +70,7 @@ func Lint() error {
 	mg.Deps(GoImports)
 	mg.Deps(Errcheck)
 	mg.Deps(Nakedret)
+	mg.Deps(Staticcheck)
 	return nil
 }
 
