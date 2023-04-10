@@ -62,8 +62,8 @@ func Nakedret() error { return mageextras.Nakedret("-l", "0") }
 // Staticcheck runs staticcheck.
 func Staticcheck() error { return mageextras.Staticcheck() }
 
-// Yamllint runs yamllint.
-func Yamllint() error { return mageextras.Yamllint("-s", ".yamllint", ".") }
+// Unmake runs unmake.
+func Unmake() error { return exec.Command("unmake", "makefile").Run() }
 
 // Lint runs the lint suite.
 func Lint() error {
@@ -74,7 +74,7 @@ func Lint() error {
 	mg.Deps(Errcheck)
 	mg.Deps(Nakedret)
 	mg.Deps(Staticcheck)
-	mg.Deps(Yamllint)
+	mg.Deps(Unmake)
 	return nil
 }
 
