@@ -55,6 +55,10 @@ BSD-2-Clause
 
 (None)
 
+## Recommended
+
+* [ASDF](https://asdf-vm.com/)
+
 # CONTRIBUTING
 
 For more information about developing cicada itself, see [DEVELOPMENT.md](DEVELOPMENT.md).
