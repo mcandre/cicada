@@ -19,6 +19,13 @@ func ProductRecordsToSchedules(name string, records ProductRecords) ([]Schedule,
 	var schedules []Schedule
 
 	for _, record := range records {
+		codename := record["codename"]
+		var cn string
+
+		if c, ok := codename.(string); ok {
+			cn = c
+		}
+
 		cycle := record["cycle"]
 		var version *semver.Version
 
@@ -46,8 +53,9 @@ func ProductRecordsToSchedules(name string, records ProductRecords) ([]Schedule,
 		}
 
 		schedule := Schedule{
-			Name:    name,
-			Version: *version,
+			Name:     name,
+			Codename: cn,
+			Version:  *version,
 		}
 
 		eol := record["eol"]

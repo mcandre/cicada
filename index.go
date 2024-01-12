@@ -4,6 +4,8 @@ import (
 	"github.com/MasterMinds/semver"
 	"gopkg.in/yaml.v3"
 
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,6 +14,9 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -45,10 +50,10 @@ const IndexProductsDirBase = "products"
 // Index models a catalog of LTS schedules.
 type Index struct {
 	// Debug enables additional logging (default: false).
-	Debug bool `yaml:"debug,omitempty"`
+	Debug bool `json:"debug,omitempty" yaml:"debug,omitempty"`
 
 	// Quiet skips system executables (default: false).
-	Quiet bool `yaml:"quiet,omitempty"`
+	Quiet bool `json:"quiet,omitempty" yaml:"quiet,omitempty"`
 
 	// LeadMonths provides a margin of time to migrate
 	// before a support timeline formally ends.
@@ -59,15 +64,15 @@ type Index struct {
 	// Negative values are treated as a reset to default value.
 	//
 	// (default: 1)
-	LeadMonths int `yaml:"lead_months,omitempty"`
+	LeadMonths int `json:"lead_months,omitempty" yaml:"lead_months,omitempty"`
 
 	// VersionQueries denotes command line queries for retrieving component versions, in exec-like format,
 	// keyed on executable base path.
-	VersionQueries map[string]VersionQuery `yaml:"version_queries"`
+	VersionQueries map[string]VersionQuery `json:"version_queries" yaml:"version_queries"`
 
 	// components denotes version schedules,
 	// keyed on component name.
-	components map[string][]Schedule `yaml:"-"`
+	components map[string][]Schedule `json:"-" yaml:"-"`
 }
 
 // IndexCacheDirPath yields the location of cicada metadata directory.
@@ -333,13 +338,11 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 		return nil, err
 	}
 
-	version := *versionP
-
 	if o.Debug {
-		log.Printf("detected os: %v v%v\n", identityOs, version.String())
+		log.Printf("detected os: %v v%v\n", identityOs, versionP.String())
 	}
 
-	return ScanComponent(identityOs, version, schedules, t), nil
+	return ScanComponent(identityOs, versionP, "", schedules, t), nil
 }
 
 // ScanApplication checks executables for non-LTS versions.
@@ -390,17 +393,17 @@ func (o Index) ScanApplication(app string, schedules []Schedule, t time.Time) (*
 		return nil, nil
 	}
 
-	version, err := semver.NewVersion(*versionString)
+	versionP, err := semver.NewVersion(*versionString)
 
 	if err != nil {
 		return nil, err
 	}
 
 	if o.Debug {
-		log.Printf("detected application: %v v%v\n", app, version.String())
+		log.Printf("detected application: %v v%v\n", app, versionP.String())
 	}
 
-	return ScanComponent(app, *version, schedules, t), nil
+	return ScanComponent(app, versionP, "", schedules, t), nil
 }
 
 // ScanApplications analyzes applications for any LTS concerns.
@@ -420,6 +423,251 @@ func (o Index) ScanApplications(t time.Time) ([]string, error) {
 	}
 
 	return warnings, nil
+}
+
+type DockerWarnings struct {
+	// Debug controls whether additional logging is enabled.
+	Debug bool
+
+	// Warninges denotes any dead base images.
+	Warnings []string
+
+	// t denotes the current timestamp.
+	t time.Time
+
+	// components denotes version schedules,
+	// keyed on component name.
+	components map[string][]Schedule `yaml:"-"`
+}
+
+// Ignores is a poor man's gitignore.
+//
+// TODO: https://github.com/mcandre/stank/issues/1
+var Ignores = []string{
+	".git",
+	"vendor",
+	"node_modules",
+}
+
+// Ignore is a poor man's gitignore.
+//
+// TODO: https://github.com/mcandre/stank/issues/1
+func Ignore(pth string) bool {
+	for _, part := range strings.Split(pth, string(os.PathSeparator)) {
+		for _, ignore := range Ignores {
+			if part == ignore {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// DockerfilePattern matches Docker image definition files.
+var DockerfilePattern = regexp.MustCompile(`(Dockerfile.*)|(.*\.[Dd]ockerfile)`)
+
+// DockerfileBaseImagePattern extracts base image names from Dockerfiles.
+var DockerfileBaseImagePattern = regexp.MustCompile(`^FROM\s+((?P<registry>.+)/)?(?P<image>[^:\s]+)(:(?P<tag>[^\s]+))?(\s+as\s+(?P<stage>[^\s]+))?$`)
+
+// Image models a Docker base image identifier.
+type Image struct {
+	Registry string
+
+	Name string
+
+	Tag string
+
+	Stage string
+}
+
+// String formats Docker image identifiers.
+func (o Image) String() string {
+	var buffer bytes.Buffer
+
+	if o.Registry != "" {
+		buffer.WriteString(fmt.Sprintf("%s/", o.Registry))
+	}
+
+	buffer.WriteString(o.Name)
+
+	if o.Tag != "" {
+		buffer.WriteString(fmt.Sprintf(":%s", o.Tag))
+	}
+
+	if o.Stage != "" {
+		buffer.WriteString(fmt.Sprintf(" as %s", o.Stage))
+	}
+
+	return buffer.String()
+}
+
+type Dockerfile struct {
+	Stages []string
+
+	BaseImages []Image
+}
+
+func ExtractBaseImages(pth string) ([]Image, error) {
+	var dockerfile Dockerfile
+
+	f, err := os.Open(pth)
+
+	if err != nil {
+		return dockerfile.BaseImages, err
+	}
+
+	defer func() {
+		if err2 := f.Close(); err2 != nil {
+			log.Print(err2)
+		}
+	}()
+
+	scanner := bufio.NewScanner(f)
+
+	registryIndex := DockerfileBaseImagePattern.SubexpIndex("registry")
+	imageIndex := DockerfileBaseImagePattern.SubexpIndex("image")
+	tagIndex := DockerfileBaseImagePattern.SubexpIndex("tag")
+	stageIndex := DockerfileBaseImagePattern.SubexpIndex("stage")
+
+	var rawImages []Image
+
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		match := DockerfileBaseImagePattern.FindStringSubmatch(line)
+
+		if len(match) <= imageIndex {
+			continue
+		}
+
+		image := Image{
+			Registry: match[registryIndex],
+			Name:     match[imageIndex],
+		}
+
+		if len(match) > tagIndex {
+			image.Tag = match[tagIndex]
+
+			if len(match) > stageIndex {
+				stage := match[stageIndex]
+				image.Stage = stage
+				dockerfile.Stages = append(dockerfile.Stages, stage)
+			}
+		}
+
+		rawImages = append(rawImages, image)
+	}
+
+	for _, rawImage := range rawImages {
+		var stageBorn bool
+
+		for _, stage := range dockerfile.Stages {
+			if rawImage.Name == stage {
+				stageBorn = true
+				break
+			}
+		}
+
+		if !stageBorn {
+			dockerfile.BaseImages = append(dockerfile.BaseImages, rawImage)
+		}
+	}
+
+	return dockerfile.BaseImages, nil
+}
+
+// Walk is a callback for filepath.Walk to lint shell scripts.
+func (o *DockerWarnings) Walk(pth string, info os.FileInfo, err error) error {
+	if err != nil {
+		return err
+	}
+
+	if Ignore(pth) {
+		return nil
+	}
+
+	fi, err := os.Stat(pth)
+
+	if err != nil {
+		return err
+	}
+
+	if fi.IsDir() {
+		return nil
+	}
+
+	match := DockerfilePattern.MatchString(pth)
+
+	if !match {
+		return nil
+	}
+
+	images, err := ExtractBaseImages(pth)
+
+	if err != nil {
+		return err
+	}
+
+	for _, image := range images {
+		if o.Debug {
+			log.Printf("detected dockerfile base image '%v': %v\n", image, pth)
+		}
+
+		if image.Tag == "" {
+			o.Warnings = append(o.Warnings, fmt.Sprintf("dockerfile base image '%v' missing tag, assuming latest", image))
+			continue
+		}
+
+		if image.Tag == "latest" {
+			o.Warnings = append(o.Warnings, fmt.Sprintf("dockerfile base image '%v' pinned to potentially floating tag", image))
+			continue
+		}
+
+		component, ok := o.components[image.Name]
+
+		if !ok {
+			if o.Debug {
+				log.Printf("skipping unknown docker image operating system: '%v': %v\n", image, pth)
+			}
+
+			continue
+		}
+
+		var versionP *semver.Version
+
+		if vP, err := semver.NewVersion(image.Tag); err == nil {
+			versionP = vP
+		}
+
+		warningP := ScanComponent(image.Name, versionP, image.Tag, component, o.t)
+
+		if warningP != nil {
+			o.Warnings = append(o.Warnings, *warningP)
+		}
+	}
+
+	return nil
+}
+
+func (o Index) ScanDockerfiles(t time.Time) ([]string, error) {
+	dockerWarnings := DockerWarnings{
+		Debug:      o.Debug,
+		components: o.components,
+		t:          t,
+	}
+
+	cwd, err := os.Getwd()
+
+	if err != nil {
+		return nil, err
+	}
+
+	if err2 := filepath.Walk(cwd, dockerWarnings.Walk); err2 != nil {
+		return dockerWarnings.Warnings, err2
+	}
+
+	return dockerWarnings.Warnings, nil
 }
 
 // Scan generates reports.
@@ -444,6 +692,13 @@ func (o Index) Scan() ([]string, error) {
 	}
 
 	warnings = append(warnings, resultsApplications...)
+	resultsDockerfiles, err := o.ScanDockerfiles(t)
+
+	if err != nil {
+		return nil, err
+	}
+
+	warnings = append(warnings, resultsDockerfiles...)
 	return warnings, nil
 }
 

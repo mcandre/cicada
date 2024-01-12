@@ -5,6 +5,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -16,22 +17,25 @@ const RFC3339DateFormat = "2006-01-02"
 type Schedule struct {
 	// Name denotes a software component:
 	// Either a GOOS value or an executable base path.
-	Name string `yaml:"name"`
+	Name string `json:"name" yaml:"name"`
+
+	// Codename denotes a version nickname.
+	Codename string `json:"codename" yaml:"codename"`
 
 	// Version denotes a software release series.
 	// Only the major and minor are included in end of life calculations.
 	// Zero minor is treated as matching any minor.
-	Version semver.Version `yaml:"version"`
+	Version semver.Version `json:"version" yaml:"version"`
 
 	// Expiration denotes a termination timestamp.
 	//
 	// nil indicates no known expiration.
 	//
 	// (default: nil)
-	Expiration *time.Time `yaml:"expiration,omitempty"`
+	Expiration *time.Time `json:"expiration,omitempty" yaml:"expiration,omitempty"`
 }
 
-// Match reports whether a schedule applies to the given software component version.
+// Match reports whether a schedule applies to the given software component version or codename.
 //
 // specificity indicates the number of elements in the original v string.
 //
@@ -43,7 +47,17 @@ type Schedule struct {
 // Note that degenerate versions may not necessarily behave as expected.
 // For example, ".1" (corresponding with "0.1"),
 // Or "1." (corresponding with "1.0").
-func (o Schedule) Match(v semver.Version, specificity int) bool {
+func (o Schedule) Match(version *semver.Version, specificity int, codename string) bool {
+	if codename != "" {
+		return regexp.MustCompile(fmt.Sprintf("(?i)%s", codename)).MatchString(o.Codename)
+	}
+
+	if version == nil {
+		return true
+	}
+
+	v := *version
+
 	if v.Major() != o.Version.Major() {
 		return false
 	}
@@ -110,19 +124,33 @@ func (o *Schedule) UnmarshalYAML(value *yaml.Node) error {
 }
 
 // ScanComponent checks whether the given component is end of life.
-func ScanComponent(name string, version semver.Version, schedules []Schedule, t time.Time) *string {
-	specificity := strings.Count(version.Original(), ".")
+//
+// Either version must be non-nil, or codename must be non-blank.
+func ScanComponent(name string, version *semver.Version, codename string, schedules []Schedule, t time.Time) *string {
+	var specificity int
+
+	if version != nil {
+		specificity = strings.Count(version.Original(), ".")
+	}
 
 	for _, schedule := range schedules {
-		if !schedule.Match(version, specificity) {
+		if !schedule.Match(version, specificity, codename) {
 			continue
 		}
 
 		if schedule.Expiration != nil {
 			expiration := *schedule.Expiration
 
+			var versionString string
+
+			if codename != "" {
+				versionString = codename
+			} else {
+				versionString = version.String()
+			}
+
 			if t.Equal(expiration) || t.After(expiration) {
-				message := fmt.Sprintf("end of life for %v v%v on %v", name, version.String(), expiration.Format(RFC3339DateFormat))
+				message := fmt.Sprintf("end of life for %v %v on %v", name, versionString, expiration.Format(RFC3339DateFormat))
 				return &message
 			}
 		}
