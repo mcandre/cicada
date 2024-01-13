@@ -9,7 +9,7 @@ import (
 )
 
 // SemVerPattern matches semantic versions.
-var SemVerPattern = regexp.MustCompile(`^[0-9\.]+$`)
+var SemVerPattern = regexp.MustCompile(`^(?P<semver>[0-9]+(\.[0-9](\.[0-9])?)?).*$`)
 
 // ProductRecords models endoflife.date product detail records.
 type ProductRecords []map[string]interface{}
@@ -17,6 +17,8 @@ type ProductRecords []map[string]interface{}
 // ProductRecordsToSchedules converts ProductRecords to Schedule arrays.
 func ProductRecordsToSchedules(name string, records ProductRecords) ([]Schedule, error) {
 	var schedules []Schedule
+
+	semVerIndex := SemVerPattern.SubexpIndex("semver")
 
 	for _, record := range records {
 		codename := record["codename"]
@@ -30,11 +32,14 @@ func ProductRecordsToSchedules(name string, records ProductRecords) ([]Schedule,
 		var version *semver.Version
 
 		if c, ok := cycle.(string); ok {
-			if !SemVerPattern.MatchString(c) {
+			match := SemVerPattern.FindStringSubmatch(c)
+
+			if len(match) <= semVerIndex {
 				continue
 			}
 
-			v, err := semver.NewVersion(c)
+			d := match[semVerIndex]
+			v, err := semver.NewVersion(d)
 
 			if err != nil {
 				return nil, err

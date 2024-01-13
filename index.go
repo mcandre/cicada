@@ -328,7 +328,7 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 		return nil, err
 	}
 
-	if versionString == nil {
+	if versionString == nil || *versionString == "" {
 		log.Fatalf("unable to identify version for os: %v", identityOs)
 	}
 
@@ -389,7 +389,11 @@ func (o Index) ScanApplication(app string, schedules []Schedule, t time.Time) (*
 		return nil, err
 	}
 
-	if versionString == nil {
+	if versionString == nil || *versionString == "" {
+		if o.Debug {
+			log.Printf("unable to identify version for app: %v\n", app)
+		}
+
 		return nil, nil
 	}
 

@@ -3,6 +3,7 @@ package cicada
 import (
 	"gopkg.in/yaml.v3"
 
+	"bufio"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -76,24 +77,35 @@ func (o *VersionQuery) UnmarshalYAML(value *yaml.Node) error {
 func (o VersionQuery) Execute() (*string, error) {
 	command, args := o.Command[0], o.Command[1:]
 	cmd := exec.Command(command, args...)
-	versionBytes, err := cmd.Output()
+	outputBytes, err := cmd.Output()
 
 	if err != nil {
 		return nil, nil
 	}
 
-	versionString := string(versionBytes)
-	versionString = strings.TrimRight(versionString, "\r\n")
+	outputString := string(outputBytes)
+	versionString := strings.TrimRight(outputString, "\r\n")
 
 	if o.Pattern != nil {
-		matches := o.Pattern.FindStringSubmatch(versionString)
-		versionIndex := o.Pattern.SubexpIndex("Version")
+		scanner := bufio.NewScanner(strings.NewReader(outputString))
 
-		if len(matches) < versionIndex+1 {
-			return nil, nil
+		var foundVersion bool
+
+		for scanner.Scan() {
+			line := scanner.Text()
+			match := o.Pattern.FindStringSubmatch(line)
+			versionIndex := o.Pattern.SubexpIndex("Version")
+
+			if len(match) > versionIndex {
+				foundVersion = true
+				versionString = match[versionIndex]
+				break
+			}
 		}
 
-		versionString = matches[versionIndex]
+		if !foundVersion {
+			return nil, nil
+		}
 	}
 
 	return &versionString, nil

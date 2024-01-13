@@ -76,8 +76,8 @@ version_queries:
     command: ["consul", "version"]
     pattern: "^Consul v(?P<Version>[0-9\\.]+)$"
   debian:
-    command: ["lsb_release", "-r"]
-    pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
+    command: ["cat", "/etc/os-release"]
+    pattern: "^PRETTY_NAME=\"Debian GNU/Linux (?P<Version>[0-9]+).*\"$"
   django:
     command: ["django-admin", "--version"]
   docker-engine:
@@ -95,8 +95,8 @@ version_queries:
     command: ["lsb_release", "-r"]
     pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
   ffmpeg:
-    command: ["ffmpeg", "--version"]
-    pattern: "ffmpeg version (?P<Version>[0-9\\.]+).+$"
+    command: ["ffmpeg", "-version"]
+    pattern: "^ffmpeg version (?P<Version>[0-9\\.]+).*$"
   firefox:
     command: ["firefox", "--version"]
     pattern: "^Mozilla Firefox (?P<Version>[0-9\\.]+)$"
@@ -143,7 +143,7 @@ version_queries:
     pattern: "^(?P<Version>[0-9\\.]+).*$"
   openssl:
     command: ["openssl", "version"]
-    pattern: "^.+ (?P<Version>[0-9\\.]+)$"
+    pattern: "^OpenSSL (?P<Version>[0-9\\.]+)\\s*.*$"
   opensuse:
     command: ["lsb_release", "-r"]
     pattern: "^Release:\\s+(?P<Version>[0-9\\.]+)$"
@@ -154,7 +154,7 @@ version_queries:
     pattern: "^PHP (?P<Version>[0-9\\.]+).+$"
   postgresql:
     command: ["postgres", "-V"]
-    pattern: "^postgres \\(PostgreSQL\\) (?P<Version>[0-9\\.]+)$"
+    pattern: "^postgres \\(PostgreSQL\\) (?P<Version>[0-9\\S]+)\\s*.*$"
   powershell:
     command: ["powershell", "-Command", "$PSVersionTable"]
     pattern: "^PSVersion\\s+(?P<Version>[0-9\\.]+)$"

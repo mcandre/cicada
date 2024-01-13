@@ -91,9 +91,9 @@ func (o Schedule) MarshalYAML() (interface{}, error) {
 // UnmarshalYAML decodes schedules.
 func (o *Schedule) UnmarshalYAML(value *yaml.Node) error {
 	type ScheduleAlias struct {
-		Name       string `yaml:"name"`
-		Version    string `yaml:"version"`
-		Expiration string `yaml:"expiration,omitempty"`
+		Name       string `json:"name" yaml:"name"`
+		Version    string `json:"version" yaml:"version"`
+		Expiration string `json:"expiration,omitempty" yaml:"expiration,omitempty"`
 	}
 
 	var aux ScheduleAlias
