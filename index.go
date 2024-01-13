@@ -345,6 +345,47 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 	return ScanComponent(identityOs, versionP, "", schedules, t), nil
 }
 
+// ScanKernel analyzes certain operating system kernels for any LTS concerns.
+func (o Index) ScanKernel(t time.Time) (*string, error) {
+	if !EnvironmentIsLinux {
+		return nil, nil
+	}
+
+	schedules, ok := o.components["linux"]
+
+	if !ok {
+		log.Fatal("missing support schedule found for product 'linux'")
+	}
+
+	query, ok := o.VersionQueries["linux"]
+
+	if !ok {
+		log.Fatal("no known version query command found for product 'linux'")
+	}
+
+	versionString, err := query.Execute()
+
+	if err != nil {
+		return nil, err
+	}
+
+	if versionString == nil || *versionString == "" {
+		log.Fatalf("unable to identify linux kernel version")
+	}
+
+	versionP, err := semver.NewVersion(*versionString)
+
+	if err != nil {
+		return nil, fmt.Errorf("unable to parse semantic linux kernel version: %v", *versionString)
+	}
+
+	if o.Debug {
+		log.Printf("detected linux kernel: v%v\n", versionP.String())
+	}
+
+	return ScanComponent("linux", versionP, "", schedules, t), nil
+}
+
 // ScanApplication checks executables for non-LTS versions.
 //
 // If a semver cannot be queried, then the application is considered to not be installed.
@@ -707,6 +748,16 @@ func (o Index) Scan() ([]string, error) {
 
 	if warningOs != nil {
 		warnings = append(warnings, *warningOs)
+	}
+
+	warningKernel, err := o.ScanKernel(t)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if warningKernel != nil {
+		warnings = append(warnings, *warningKernel)
 	}
 
 	resultsApplications, err := o.ScanApplications(t)

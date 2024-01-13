@@ -6,6 +6,8 @@ import (
 	"github.com/zcalusic/sysinfo"
 )
 
+var EnvironmentIsLinux bool = true
+
 // RecognizeOs identifies the environment,
 // as an endoflife.date product name.
 func RecognizeOs() (*string, error) {

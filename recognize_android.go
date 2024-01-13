@@ -6,6 +6,8 @@ import (
 	"runtime"
 )
 
+var EnvironmentIsLinux bool = true
+
 // RecognizeOs identifies the environment,
 // as an endoflife.date product name.
 func RecognizeOs() (*string, error) {
