@@ -335,7 +335,7 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 	versionP, err := semver.NewVersion(*versionString)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to parse semantic version: %v for os: %v", *versionString, identityOs)
 	}
 
 	if o.Debug {
@@ -347,7 +347,7 @@ func (o Index) ScanOs(t time.Time) (*string, error) {
 
 // ScanApplication checks executables for non-LTS versions.
 //
-// If the executable is not found, a warning may not be emitted.
+// If a semver cannot be queried, then the application is considered to not be installed.
 func (o Index) ScanApplication(app string, schedules []Schedule, t time.Time) (*string, error) {
 	if IsOperatingSystem(app) {
 		return nil, nil
@@ -364,7 +364,6 @@ func (o Index) ScanApplication(app string, schedules []Schedule, t time.Time) (*
 	}
 
 	executable := query.Command[0]
-
 	executablePath, err := exec.LookPath(executable)
 
 	if err != nil {
@@ -400,7 +399,11 @@ func (o Index) ScanApplication(app string, schedules []Schedule, t time.Time) (*
 	versionP, err := semver.NewVersion(*versionString)
 
 	if err != nil {
-		return nil, err
+		if o.Debug {
+			log.Printf("unable to parse semantic version: '%v' for app: '%v'\n", *versionString, app)
+		}
+
+		return nil, nil
 	}
 
 	if o.Debug {
