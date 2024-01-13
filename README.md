@@ -18,6 +18,7 @@ Other security tools act like canaries in the coal mine. But by the time the can
 $ cicada
 warning: end of life for ruby 2.6.8 on 2022-03-31
 warning: end of life for ubuntu hirsute on 2022-01-20
+warning: end of life for debian stretch on 2022-06-30
 ```
 
 See `cicada -help` for more detail.

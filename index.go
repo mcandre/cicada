@@ -625,7 +625,17 @@ func (o *DockerWarnings) Walk(pth string, info os.FileInfo, err error) error {
 			log.Printf("detected dockerfile base image '%v': %v\n", image, pth)
 		}
 
-		component, ok := o.components[image.Name]
+		name := image.Name
+
+		if strings.HasSuffix(name, "-slim") {
+			if o.Debug {
+				log.Printf("trimming -slim suffix from base image name: %v\n", name)
+			}
+		}
+
+		name = strings.TrimSuffix(image.Name, "-slim")
+
+		component, ok := o.components[name]
 
 		if !ok {
 			if o.Debug {
@@ -637,11 +647,21 @@ func (o *DockerWarnings) Walk(pth string, info os.FileInfo, err error) error {
 
 		var versionP *semver.Version
 
-		if vP, err := semver.NewVersion(image.Tag); err == nil {
+		tag := image.Tag
+
+		if strings.HasSuffix(tag, "-slim") {
+			if o.Debug {
+				log.Printf("trimming -slim suffix from base image tag: %v\n", tag)
+			}
+		}
+
+		tag = strings.TrimSuffix(tag, "-slim")
+
+		if vP, err := semver.NewVersion(tag); err == nil {
 			versionP = vP
 		}
 
-		warningP := ScanComponent(image.Name, versionP, image.Tag, component, o.t)
+		warningP := ScanComponent(name, versionP, tag, component, o.t)
 
 		if warningP != nil {
 			o.Warnings = append(o.Warnings, *warningP)
