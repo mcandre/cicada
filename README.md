@@ -74,6 +74,10 @@ For enterprise systems, a variety of tools are available to identify specific vu
 
 cicada is future compatible: Any software components targeting developmental, git HEAD versions should not trigger false alarms. Maybe you're already consuming clang tip, for example, which is well ahead of the pack. For the rest of us, we can relax and enjoy stable, LTS releases. Rest well on islands of stability. Let cicada guide you to successful operation.
 
+cicada can even scan direct parent base images in `Dockerfile`s in terms of `FROM` OS support timelines.
+
+For a deeper level of scanning, run `cicada` inside your containers, VM's, or other pre-production environments. Such as part of a linter phase in a CI/CD pipeline.
+
 Ultimately, how you use cicada is up to you. We try to strike a balance between comprehensiveness and practicality, so that you can tailor cicada to your team's particular needs.
 
 # SEE ALSO
