@@ -544,15 +544,23 @@ func ExtractBaseImages(pth string) ([]Image, error) {
 		image := Image{
 			Registry: match[registryIndex],
 			Name:     match[imageIndex],
+			Tag:      "latest",
 		}
 
 		if len(match) > tagIndex {
-			image.Tag = match[tagIndex]
+			tag := match[tagIndex]
+
+			if tag != "" {
+				image.Tag = match[tagIndex]
+			}
 
 			if len(match) > stageIndex {
 				stage := match[stageIndex]
-				image.Stage = stage
-				dockerfile.Stages = append(dockerfile.Stages, stage)
+
+				if stage != "" {
+					image.Stage = stage
+					dockerfile.Stages = append(dockerfile.Stages, stage)
+				}
 			}
 		}
 
@@ -612,16 +620,6 @@ func (o *DockerWarnings) Walk(pth string, info os.FileInfo, err error) error {
 	for _, image := range images {
 		if o.Debug {
 			log.Printf("detected dockerfile base image '%v': %v\n", image, pth)
-		}
-
-		if image.Tag == "" {
-			o.Warnings = append(o.Warnings, fmt.Sprintf("dockerfile base image '%v' missing tag, assuming latest", image))
-			continue
-		}
-
-		if image.Tag == "latest" {
-			o.Warnings = append(o.Warnings, fmt.Sprintf("dockerfile base image '%v' pinned to potentially floating tag", image))
-			continue
 		}
 
 		component, ok := o.components[image.Name]

@@ -15,13 +15,9 @@ Other security tools act like canaries in the coal mine. But by the time the can
 # EXAMPLE
 
 ```console
-$ cd example
-
 $ cicada
 warning: end of life for ruby 2.6.8 on 2022-03-31
 warning: end of life for ubuntu hirsute on 2022-01-20
-warning: dockerfile base image 'alpine:latest' pinned to potentially floating tag
-warning: dockerfile base image 'fedora' missing tag, assuming latest
 ```
 
 See `cicada -help` for more detail.

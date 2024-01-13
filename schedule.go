@@ -124,8 +124,6 @@ func (o *Schedule) UnmarshalYAML(value *yaml.Node) error {
 }
 
 // ScanComponent checks whether the given component is end of life.
-//
-// Either version must be non-nil, or codename must be non-blank.
 func ScanComponent(name string, version *semver.Version, codename string, schedules []Schedule, t time.Time) *string {
 	var specificity int
 
@@ -141,11 +139,9 @@ func ScanComponent(name string, version *semver.Version, codename string, schedu
 		if schedule.Expiration != nil {
 			expiration := *schedule.Expiration
 
-			var versionString string
+			versionString := codename
 
-			if codename != "" {
-				versionString = codename
-			} else {
+			if version != nil {
 				versionString = version.String()
 			}
 
