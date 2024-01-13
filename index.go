@@ -538,7 +538,6 @@ func ExtractBaseImages(pth string) ([]Image, error) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-
 		match := DockerfileBaseImagePattern.FindStringSubmatch(line)
 
 		if len(match) <= imageIndex {
