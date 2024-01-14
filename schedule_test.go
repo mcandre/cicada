@@ -1,7 +1,7 @@
 package cicada_test
 
 import (
-	"github.com/MasterMinds/semver"
+	"github.com/Masterminds/semver"
 	"github.com/mcandre/cicada"
 	"gopkg.in/yaml.v3"
 

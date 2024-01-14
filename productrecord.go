@@ -1,7 +1,7 @@
 package cicada
 
 import (
-	"github.com/MasterMinds/semver"
+	"github.com/Masterminds/semver"
 
 	"regexp"
 	"strconv"
