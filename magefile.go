@@ -17,8 +17,17 @@ var artifactsPath = "bin"
 // Default references the default build task.
 var Default = Test
 
+// Govulncheck runs govulncheck.
+func Govulncheck() error { return mageextras.Govulncheck("./...") }
+
+// SnykTest runs Snyk SCA.
+func SnykTest() error { return mageextras.SnykTest() }
+
 // Audit runs a security audit.
-func Audit() error { return mageextras.SnykTest() }
+func Audit() error {
+	mg.Deps(Govulncheck)
+	return SnykTest()
+}
 
 // IntegrationTest executes the integration test suite.
 func UnitTest() error { return mageextras.UnitTest() }
