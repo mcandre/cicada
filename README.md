@@ -31,7 +31,7 @@ This is where cicada steps in. cicada helps engineers to identify more non-LTS s
 
 # DOCUMENTATION
 
-https://godoc.org/github.com/mcandre/cicada
+https://pkg.go.dev/github.com/mcandre/cicada
 
 # DOWNLOAD
 
