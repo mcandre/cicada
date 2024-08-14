@@ -87,5 +87,4 @@ Ultimately, how you use cicada is up to you. We try to strike a balance between 
 * [endoflife.date](https://endoflife.date/) for support lifetime data
 * [npm](https://www.npmjs.com/) scans Node.js projects for vulnerabilities
 * [RubyGems](https://rubygems.org/) scans Ruby projects for vulnerabilities
-* [safety](https://pypi.org/project/safety/) scans Python projects for vulnerabilities
 * [Snyk](https://snyk.io/) scans software projects and Docker images for vulnerabilities
