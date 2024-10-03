@@ -2,6 +2,7 @@
 
 package cicada
 
+// EnvironmentIsLinux checks whether the current platform is Linux.
 var EnvironmentIsLinux bool = false
 
 // RecognizeOs identifies the environment,

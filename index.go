@@ -473,6 +473,7 @@ func (o Index) ScanApplications(t time.Time) ([]string, error) {
 	return warnings, nil
 }
 
+// DockerWarnings models deprecation findings for Docker images.
 type DockerWarnings struct {
 	// Debug controls whether additional logging is enabled.
 	Debug bool
@@ -550,12 +551,15 @@ func (o Image) String() string {
 	return buffer.String()
 }
 
+// Dockerfile models a Docker image configuration.
 type Dockerfile struct {
 	Stages []string
 
 	BaseImages []Image
 }
 
+// ExtractBaseImages collects the base image names
+// for all the build stages of a Dockerfile path.
 func ExtractBaseImages(pth string) ([]Image, error) {
 	var dockerfile Dockerfile
 
@@ -715,6 +719,7 @@ func (o *DockerWarnings) Walk(pth string, info os.FileInfo, err error) error {
 	return nil
 }
 
+// ScanDockerfiles analyzes Dockerfiles.
 func (o Index) ScanDockerfiles(t time.Time) ([]string, error) {
 	dockerWarnings := DockerWarnings{
 		Debug:      o.Debug,

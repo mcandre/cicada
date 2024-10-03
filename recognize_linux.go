@@ -6,6 +6,7 @@ import (
 	"github.com/zcalusic/sysinfo"
 )
 
+// EnvironmentIsLinux checks whether the current platform is Linux.
 var EnvironmentIsLinux bool = true
 
 // RecognizeOs identifies the environment,

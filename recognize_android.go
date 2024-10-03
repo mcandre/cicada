@@ -6,6 +6,7 @@ import (
 	"runtime"
 )
 
+// EnvironmentIsLinux checks whether the current platform is Linux.
 var EnvironmentIsLinux bool = true
 
 // RecognizeOs identifies the environment,
