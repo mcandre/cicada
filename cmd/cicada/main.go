@@ -1,3 +1,4 @@
+// Package main implements an LTS linter.
 package main
 
 import (

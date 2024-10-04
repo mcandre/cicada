@@ -1,3 +1,4 @@
+// Package cicada implements primitives for scanning tech stacks against LTS support timelines.
 package cicada
 
 // DefaultLeadMonths provides additional time for engineers

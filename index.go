@@ -637,7 +637,7 @@ func ExtractBaseImages(pth string) ([]Image, error) {
 }
 
 // Walk is a callback for filepath.Walk to lint shell scripts.
-func (o *DockerWarnings) Walk(pth string, info os.FileInfo, err error) error {
+func (o *DockerWarnings) Walk(pth string, _ os.FileInfo, err error) error {
 	if err != nil {
 		return err
 	}
