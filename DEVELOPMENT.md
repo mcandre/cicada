@@ -44,7 +44,7 @@ $ mage uninstall
 $ mage lint
 ```
 
-# TEST: UNIT + INTEGRATION
+# TEST
 
 ```console
 $ mage test

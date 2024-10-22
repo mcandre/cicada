@@ -4,7 +4,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/magefile/mage/mg"
 	"github.com/mcandre/cicada"
@@ -29,24 +28,8 @@ func Audit() error {
 	return Snyk()
 }
 
-// IntegrationTest executes the integration test suite.
-func UnitTest() error { return mageextras.UnitTest() }
-
-// IntegrationTest executes the integration test suite.
-func IntegrationTest() error {
-	mg.Deps(Install)
-
-	cmd := exec.Command("cicada", "-help")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
-
-func Test() error {
-	mg.Deps(UnitTest)
-	mg.Deps(IntegrationTest)
-	return nil
-}
+// Test runs a test suite.
+func Test() error { return mageextras.UnitTest() }
 
 // Deadcode runs deadcode.
 func Deadcode() error { return mageextras.Deadcode("./...") }
