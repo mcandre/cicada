@@ -7,7 +7,7 @@ import (
 )
 
 // EnvironmentIsLinux checks whether the current platform is Linux.
-var EnvironmentIsLinux bool = true
+var EnvironmentIsLinux = true
 
 // RecognizeOs identifies the environment,
 // as an endoflife.date product name.
