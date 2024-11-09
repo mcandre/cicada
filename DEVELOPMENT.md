@@ -1,7 +1,7 @@
 # BUILDTIME REQUIREMENTS
 
 * [ASDF](https://asdf-vm.com/) 0.10 (run `asdf reshim` after provisioning)
-* [Go](https://go.dev/) 1.23.2+
+* [Go](https://go.dev/) 1.23.3+
 * [GNU](https://www.gnu.org/software/make/) / [BSD](https://man.freebsd.org/cgi/man.cgi?make(1)) make
 * [Ruby](https://www.ruby-lang.org/en/)
 * [Rust](https://www.rust-lang.org/) 1.75.0+
