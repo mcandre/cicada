@@ -1,16 +1,137 @@
+# github.com/BurntSushi/toml v1.4.1-0.20240526193622-a339e1f7089c
+## explicit; go 1.18
+github.com/BurntSushi/toml
+github.com/BurntSushi/toml/internal
 # github.com/Masterminds/semver v1.5.0
 ## explicit
 github.com/Masterminds/semver
-# github.com/magefile/mage v1.14.0
+# github.com/alexkohler/nakedret/v2 v2.0.5
+## explicit; go 1.21
+github.com/alexkohler/nakedret/v2
+github.com/alexkohler/nakedret/v2/cmd/nakedret
+# github.com/chavacava/garif v0.1.0
+## explicit; go 1.16
+github.com/chavacava/garif
+# github.com/fatih/color v1.18.0
+## explicit; go 1.17
+github.com/fatih/color
+# github.com/fatih/structtag v1.2.0
 ## explicit; go 1.12
+github.com/fatih/structtag
+# github.com/hashicorp/go-version v1.7.0
+## explicit
+github.com/hashicorp/go-version
+# github.com/kisielk/errcheck v1.8.0
+## explicit; go 1.18
+github.com/kisielk/errcheck
+github.com/kisielk/errcheck/errcheck
+# github.com/magefile/mage v1.15.0
+## explicit; go 1.12
+github.com/magefile/mage
+github.com/magefile/mage/internal
+github.com/magefile/mage/mage
 github.com/magefile/mage/mg
+github.com/magefile/mage/parse
+github.com/magefile/mage/sh
+# github.com/mattn/go-colorable v0.1.14
+## explicit; go 1.18
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.20
+## explicit; go 1.15
+github.com/mattn/go-isatty
+# github.com/mattn/go-runewidth v0.0.16
+## explicit; go 1.9
+github.com/mattn/go-runewidth
+# github.com/mcandre/factorio v0.0.9
+## explicit; go 1.24
+github.com/mcandre/factorio
+github.com/mcandre/factorio/cmd/factorio
 # github.com/mcandre/mage-extras v0.0.21
 ## explicit; go 1.23
 github.com/mcandre/mage-extras
+# github.com/mgechev/dots v0.0.0-20210922191527-e955255bf517
+## explicit
+github.com/mgechev/dots
+# github.com/mgechev/revive v1.6.0
+## explicit; go 1.22.1
+github.com/mgechev/revive
+github.com/mgechev/revive/cli
+github.com/mgechev/revive/config
+github.com/mgechev/revive/formatter
+github.com/mgechev/revive/internal/astutils
+github.com/mgechev/revive/internal/ifelse
+github.com/mgechev/revive/internal/typeparams
+github.com/mgechev/revive/lint
+github.com/mgechev/revive/logging
+github.com/mgechev/revive/revivelib
+github.com/mgechev/revive/rule
+# github.com/olekukonko/tablewriter v0.0.5
+## explicit; go 1.12
+github.com/olekukonko/tablewriter
+# github.com/rivo/uniseg v0.4.7
+## explicit; go 1.18
+github.com/rivo/uniseg
+# github.com/spf13/afero v1.12.0
+## explicit; go 1.21
+github.com/spf13/afero
+github.com/spf13/afero/internal/common
+github.com/spf13/afero/mem
 # github.com/zcalusic/sysinfo v0.9.5
 ## explicit; go 1.17
 github.com/zcalusic/sysinfo
 github.com/zcalusic/sysinfo/cpuid
+# golang.org/x/mod v0.23.0
+## explicit; go 1.22.0
+golang.org/x/mod/internal/lazyregexp
+golang.org/x/mod/modfile
+golang.org/x/mod/module
+golang.org/x/mod/semver
+# golang.org/x/sync v0.11.0
+## explicit; go 1.18
+golang.org/x/sync/errgroup
+# golang.org/x/sys v0.30.0
+## explicit; go 1.18
+golang.org/x/sys/unix
+golang.org/x/sys/windows
+# golang.org/x/text v0.22.0
+## explicit; go 1.18
+golang.org/x/text/runes
+golang.org/x/text/transform
+golang.org/x/text/unicode/norm
+# golang.org/x/tools v0.30.0
+## explicit; go 1.22.0
+golang.org/x/tools/go/analysis
+golang.org/x/tools/go/analysis/checker
+golang.org/x/tools/go/analysis/internal
+golang.org/x/tools/go/analysis/internal/analysisflags
+golang.org/x/tools/go/analysis/internal/checker
+golang.org/x/tools/go/analysis/passes/inspect
+golang.org/x/tools/go/analysis/singlechecker
+golang.org/x/tools/go/analysis/unitchecker
+golang.org/x/tools/go/ast/astutil
+golang.org/x/tools/go/ast/inspector
+golang.org/x/tools/go/gcexportdata
+golang.org/x/tools/go/packages
+golang.org/x/tools/go/types/objectpath
+golang.org/x/tools/go/types/typeutil
+golang.org/x/tools/internal/aliases
+golang.org/x/tools/internal/analysisinternal
+golang.org/x/tools/internal/astutil/edge
+golang.org/x/tools/internal/diff
+golang.org/x/tools/internal/diff/lcs
+golang.org/x/tools/internal/event
+golang.org/x/tools/internal/event/core
+golang.org/x/tools/internal/event/keys
+golang.org/x/tools/internal/event/label
+golang.org/x/tools/internal/facts
+golang.org/x/tools/internal/gcimporter
+golang.org/x/tools/internal/gocommand
+golang.org/x/tools/internal/packagesinternal
+golang.org/x/tools/internal/pkgbits
+golang.org/x/tools/internal/stdlib
+golang.org/x/tools/internal/typeparams
+golang.org/x/tools/internal/typesinternal
+golang.org/x/tools/internal/versions
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
