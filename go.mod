@@ -5,8 +5,8 @@ go 1.24
 require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/magefile/mage v1.15.0
-	github.com/mcandre/mage-extras v0.0.21
-	github.com/zcalusic/sysinfo v0.9.5
+	github.com/mcandre/mage-extras v0.0.23
+	github.com/zcalusic/sysinfo v1.1.3
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -16,6 +16,7 @@ require (
 	github.com/chavacava/garif v0.1.0 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/go-version v1.7.0 // indirect
 	github.com/kisielk/errcheck v1.8.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
