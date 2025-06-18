@@ -1,6 +1,6 @@
 module github.com/mcandre/cicada
 
-go 1.24
+go 1.24.4
 
 require (
 	github.com/Masterminds/semver v1.5.0
@@ -22,7 +22,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
-	github.com/mcandre/factorio v0.0.11 // indirect
+	github.com/mcandre/factorio v0.0.12 // indirect
 	github.com/mgechev/dots v0.0.0-20210922191527-e955255bf517 // indirect
 	github.com/mgechev/revive v1.9.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
