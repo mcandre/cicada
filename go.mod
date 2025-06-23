@@ -5,7 +5,7 @@ go 1.24.4
 require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/magefile/mage v1.15.0
-	github.com/mcandre/mage-extras v0.0.23
+	github.com/mcandre/mage-extras v0.0.25
 	github.com/zcalusic/sysinfo v1.1.3
 	gopkg.in/yaml.v3 v3.0.1
 )
