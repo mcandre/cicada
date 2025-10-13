@@ -12,8 +12,8 @@ github.com/kisielk/errcheck v1.9.0 h1:9xt1zI9EBfcYBvdU1nVrzMzzUPUtPKs9bVSIM3TAb3
 github.com/kisielk/errcheck v1.9.0/go.mod h1:kQxWMMVZgIkDq7U8xtG/n2juOjbLgZtedi0D+/VL/i8=
 github.com/magefile/mage v1.15.0 h1:BvGheCMAsG3bWUDbZ8AyXXpCNwU9u5CB6sM+HNb9HYg=
 github.com/magefile/mage v1.15.0/go.mod h1:z5UZb/iS3GoOSn0JgWuiw7dxlurVYTu+/jHXqQg881A=
-github.com/mcandre/factorio v0.0.13 h1:UjxdD1wko4m6aRWmZbqLE9rwXdBAVLOahiGCDk7IZc8=
-github.com/mcandre/factorio v0.0.13/go.mod h1:rvH73CQ0uo2Z2xXQDfENmsSuhzuXQ4ZhFjd9QVWu9B0=
+github.com/mcandre/factorio v0.0.14 h1:C6KqRYdxUgTpv+5aUv+tpNUvo4+dP0TopB2P/zGJmaM=
+github.com/mcandre/factorio v0.0.14/go.mod h1:DcvgExqiLyP5Drk928Yo+RjuOExj2Kx35o0czB49Btg=
 github.com/mcandre/mage-extras v0.0.26 h1:zsE6CJImDnnjkoB1P4lFJtQ1I/vftmStmDJFEFlHIoY=
 github.com/mcandre/mage-extras v0.0.26/go.mod h1:bwHAsNdpYsdpgYNAvlFjuS34fDHlTNcsHyQKJUg4HYw=
 github.com/zcalusic/sysinfo v1.1.3 h1:u/AVENkuoikKuIZ4sUEJ6iibpmQP6YpGD8SSMCrqAF0=
