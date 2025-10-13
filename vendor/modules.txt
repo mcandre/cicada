@@ -28,8 +28,8 @@ github.com/magefile/mage/sh
 ## explicit; go 1.24.6
 github.com/mcandre/factorio
 github.com/mcandre/factorio/cmd/factorio
-# github.com/mcandre/mage-extras v0.0.26
-## explicit; go 1.24.5
+# github.com/mcandre/mage-extras v0.0.27
+## explicit; go 1.24.6
 github.com/mcandre/mage-extras
 # github.com/zcalusic/sysinfo v1.1.3
 ## explicit; go 1.22
